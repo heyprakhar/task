@@ -1,14 +1,11 @@
 package com.taskflow.taskk.entity;
 
-// import statements -
 import com.taskflow.taskk.common.entity.BaseEntity;
-import jakarta.persistence.Entity;
-import lombok.Data;
-import jakarta.persistence.Table;
-import jakarta.persistence.Column;
-import com.taskflow.taskk.enums.TaskStatus;
 import com.taskflow.taskk.enums.TaskPriority;
+import com.taskflow.taskk.enums.TaskStatus;
 
+import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
 @Data
@@ -21,12 +18,19 @@ public class Task extends BaseEntity {
     @Column(length = 1000)
     private String description;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private TaskStatus status;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "priority")
     private TaskPriority priority;
 
-    @Column(name = "assigned_to", nullable = true) // by default, a task can be unassigned, so we allow null values for assignedTo
+    @ManyToOne
+    @JoinColumn(name = "assigned_to")
     private User assignedTo;
+
+    @ManyToOne
+    @JoinColumn(name = "created_by", nullable = false)
+    private User createdBy;
 }
