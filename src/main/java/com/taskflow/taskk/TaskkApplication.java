@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 public class TaskkApplication {
 
 	public static void main(String[] args) {
-        log.info("Task created successfully");
+        log.info("Application started successfully");
 		SpringApplication.run(TaskkApplication.class, args);
 	}
 
