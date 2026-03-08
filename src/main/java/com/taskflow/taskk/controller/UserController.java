@@ -15,6 +15,8 @@ import com.taskflow.taskk.service.serviceInterface.UserService;
 import com.taskflow.taskk.common.response.BaseApiResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import java.util.List;
+import java.util.UUID;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 @AllArgsConstructor
@@ -43,4 +45,12 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+
+    //fetch user by Id endpoint-
+    @GetMapping("/fetch-user/{id}")
+    public ResponseEntity<BaseApiResponse<UserResponseDto>> getUserById(@PathVariable UUID id) {
+        UserResponseDto userResponseDto = userService.fetchUserById(id);
+        BaseApiResponse<UserResponseDto> response = new BaseApiResponse<>(true, "User fetched successfully", userResponseDto);
+        return new ResponseEntity<>(response, HttpStatus.OK);   
+}
 }
