@@ -10,7 +10,7 @@ import com.taskflow.taskk.repository.UserRepository;
 import com.taskflow.taskk.service.serviceInterface.UserService;
 import java.util.List;
 import java.util.stream.Collectors;
-
+import java.util.UUID;
 import static com.taskflow.taskk.commonUtils.Constants.*;
 
 import lombok.AllArgsConstructor;
@@ -70,4 +70,10 @@ public class UserServiceImpl implements UserService {
                     .map(UserMapper::toUserResponseDto)
                     .collect(Collectors.toList());  
     }
+    // fetch user by Id-
+        public UserResponseDto fetchUserById(UUID id) {
+            User user = userRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+            return UserMapper.toUserResponseDto(user);
+        }
 }
