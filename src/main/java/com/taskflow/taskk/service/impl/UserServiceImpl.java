@@ -8,6 +8,8 @@ import com.taskflow.taskk.mapper.UserMapper;
 import com.taskflow.taskk.repository.RoleRepository;
 import com.taskflow.taskk.repository.UserRepository;
 import com.taskflow.taskk.service.serviceInterface.UserService;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.taskflow.taskk.commonUtils.Constants.*;
 
@@ -59,5 +61,13 @@ public class UserServiceImpl implements UserService {
         log.info("User created successfully with ID: {}", savedUser.getId());
 
         return UserMapper.toUserResponseDto(savedUser);
+    }
+
+    //fetch all users -
+    public List<UserResponseDto> fetchAllUsers() {
+            List<User> users = userRepository.findAll();
+            return users.stream()
+                    .map(UserMapper::toUserResponseDto)
+                    .collect(Collectors.toList());  
     }
 }

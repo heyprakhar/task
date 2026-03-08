@@ -13,6 +13,8 @@ import com.taskflow.taskk.dto.requestDto.UserRequestDto;
 import com.taskflow.taskk.dto.responseDto.UserResponseDto;
 import com.taskflow.taskk.service.serviceInterface.UserService;
 import com.taskflow.taskk.common.response.BaseApiResponse;
+import org.springframework.web.bind.annotation.GetMapping;
+import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -32,4 +34,13 @@ public class UserController {
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
+    // fetch all user endpoint-
+@GetMapping("/fetch-all-users")
+    public ResponseEntity<BaseApiResponse<List<UserResponseDto>>> getAllUsers() {
+        List<UserResponseDto> users = userService.fetchAllUsers();
+        BaseApiResponse<List<UserResponseDto>> response = new BaseApiResponse<>(true, "Users fetched successfully", users);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 }
