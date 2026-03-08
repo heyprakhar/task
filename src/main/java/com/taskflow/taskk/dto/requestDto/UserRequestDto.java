@@ -1,0 +1,14 @@
+package com.taskflow.taskk.dto.requestDto;
+
+
+// import statements - 
+import lombok.Data;
+
+
+
+@Data
+public class UserRequestDto {
+    private String name;
+    private String email;
+    private String password;
+}
