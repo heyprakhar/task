@@ -71,9 +71,29 @@ public class UserServiceImpl implements UserService {
                     .collect(Collectors.toList());  
     }
     // fetch user by Id-
-        public UserResponseDto fetchUserById(UUID id) {
+    public UserResponseDto fetchUserById(UUID id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+        return UserMapper.toUserResponseDto(user);
+    }
+
+        
+    
+        // update user details-
+        public UserResponseDto updateUserById(UUID id, UserRequestDto userRequestDto){
             User user = userRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
-            return UserMapper.toUserResponseDto(user);
+            user.setName(userRequestDto.getName());
+            user.setEmail(userRequestDto.getEmail());
+            user.setPassword(userRequestDto.getPassword());
+            User updatedUser = userRepository.save(user);
+            return UserMapper.toUserResponseDto(updatedUser);
+        }
+
+        // delete user by Id- 
+        public void deleteUserById(UUID id){
+            User user = userRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+            userRepository.delete(user);
         }
 }
