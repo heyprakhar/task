@@ -14,4 +14,8 @@ public interface UserService {
     List<UserResponseDto> fetchAllUsers();
         
     UserResponseDto fetchUserById(UUID id);
+
+    UserResponseDto updateUserById(UUID id, UserRequestDto userRequestDto);
+
+    void deleteUserById(UUID id);
 }
