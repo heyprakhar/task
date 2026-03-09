@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 @RestController
 @AllArgsConstructor
@@ -50,7 +52,26 @@ public class UserController {
     @GetMapping("/fetch-user/{id}")
     public ResponseEntity<BaseApiResponse<UserResponseDto>> getUserById(@PathVariable UUID id) {
         UserResponseDto userResponseDto = userService.fetchUserById(id);
-        BaseApiResponse<UserResponseDto> response = new BaseApiResponse<>(true, "User fetched successfully", userResponseDto);
-        return new ResponseEntity<>(response, HttpStatus.OK);   
-}
+        BaseApiResponse<UserResponseDto> response = new BaseApiResponse<>(true, "User fetched successfully",
+                userResponseDto);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    //update user details endpoint-
+    @PatchMapping("/update-user/{id}")
+     public ResponseEntity<BaseApiResponse<UserResponseDto>> updateUserById(@PathVariable UUID id, @RequestBody UserRequestDto userRequestDto) {
+        UserResponseDto updatedUser = userService.updateUserById(id, userRequestDto);
+        BaseApiResponse<UserResponseDto> response = new BaseApiResponse<>(true, "User updated successfully",
+                updatedUser);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+     }
+
+     // delete user by Id endpoint- 
+    @DeleteMapping("/delete-user/{id}")
+    public ResponseEntity<BaseApiResponse<Void>> deleteUserById(@PathVariable UUID id){
+        userService.deleteUserById(id);
+        BaseApiResponse<Void> response = new BaseApiResponse<>(true, "User deleted successfully", null);
+        return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
+    }
+   
 }
