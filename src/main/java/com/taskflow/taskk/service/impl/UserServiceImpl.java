@@ -64,6 +64,7 @@ public class UserServiceImpl implements UserService {
     }
 
     //fetch all users -
+    @Override
     public List<UserResponseDto> fetchAllUsers() {
             List<User> users = userRepository.findAll();
             return users.stream()
@@ -79,7 +80,8 @@ public class UserServiceImpl implements UserService {
 
         
     
-        // update user details-
+    // update user details-
+        @Override
         public UserResponseDto updateUserById(UUID id, UserRequestDto userRequestDto){
             User user = userRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
@@ -91,9 +93,39 @@ public class UserServiceImpl implements UserService {
         }
 
         // delete user by Id- 
+        @Override
         public void deleteUserById(UUID id){
             User user = userRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
             userRepository.delete(user);
         }
+
+        // activate user account -
+        @Override
+        public void activateUserAccount(UUID id) {
+            User user = userRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+            if (user.isActive()) {
+                log.warn("User account is already active for user ID: {}", id);
+                throw new RuntimeException("User account is already active");
+            }
+            user.setActive(true);
+            userRepository.save(user);
+            log.info("User account activated successfully for user ID: {}", id);
+        }
+
+        // deactivate user account -
+        @Override
+        public void deactivateUserAccount(UUID id) {
+            User user = userRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+            if (!user.isActive()) {
+                log.warn("User account is already inactive for user ID: {}", id);
+                throw new RuntimeException("User account is already inactive");
+            }
+            user.setActive(false);
+            userRepository.save(user);
+            log.info("User account deactivated successfully for user ID: {}", id);
+        }
+
 }
