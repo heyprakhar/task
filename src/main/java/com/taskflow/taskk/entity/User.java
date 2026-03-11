@@ -15,17 +15,17 @@ import jakarta.persistence.FetchType;
 @Data
 public class User extends BaseEntity {
 
-    @Column(nullable = false, unique = true)
-    private String username;
+    @Column(nullable = false)
+    private String name;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, updatable = true)
     private String email;
 
     @Column(nullable = false)
     private String password;
 
     @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name = "role_id")
+    @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
    @Column(name = "is_active")
