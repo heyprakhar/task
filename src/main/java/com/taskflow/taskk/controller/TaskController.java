@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import java.util.UUID;
 import org.springframework.web.bind.annotation.PatchMapping;
 import com.taskflow.taskk.dto.requestDto.TaskStatusUpdateRequestDto;
+import org.springframework.web.bind.annotation.GetMapping;
+import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -44,12 +46,36 @@ public class TaskController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     
-    // update task status endpoint - 
+    // update task status endpoint -
     @PatchMapping("/{taskId}/update-status")
     public ResponseEntity<BaseApiResponse<TaskResponseDto>> updateTask(@PathVariable UUID taskId,
             @RequestBody TaskStatusUpdateRequestDto taskStatusUpdateRequestDto) {
         TaskResponseDto taskResponseDto = taskService.updateTaskStatus(taskId, taskStatusUpdateRequestDto);
         BaseApiResponse<TaskResponseDto> response = new BaseApiResponse<>(true, "Task status updated successfully", taskResponseDto);
-        return new ResponseEntity<>(response, HttpStatus.OK);   
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    // fetch all tasks -
+    @GetMapping("/fetch-tasks")
+    public ResponseEntity<BaseApiResponse<List<TaskResponseDto>>> fetchAllTasks() {
+        List<TaskResponseDto> tasks = taskService.getAllTasks();
+        BaseApiResponse<List<TaskResponseDto>> response = new BaseApiResponse<>(true, "Tasks fetched successfully", tasks);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    // fetch tasks by user -
+    @GetMapping("/fetch-tasks/user/{userId}") 
+    public ResponseEntity<BaseApiResponse<List<TaskResponseDto>>> fetchTasksByUserId(@PathVariable UUID userId) {
+        List<TaskResponseDto> tasks = taskService.getTasksByUserId(userId);
+        BaseApiResponse<List<TaskResponseDto>> response = new BaseApiResponse<>(true, "Tasks fetched successfully for user with id: " + userId, tasks);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    // fetch task by taskId -
+    @GetMapping("/fetch-tasks/{taskId}")
+    public ResponseEntity<BaseApiResponse<TaskResponseDto>> fetchTaskById(@PathVariable UUID taskId) {
+        TaskResponseDto taskResponseDto = taskService.getTaskByID(taskId);
+        BaseApiResponse<TaskResponseDto> response = new BaseApiResponse<>(true, "Task fetched successfully with id: " + taskId, taskResponseDto);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
