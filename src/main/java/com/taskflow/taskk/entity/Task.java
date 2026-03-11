@@ -29,8 +29,4 @@ public class Task extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "assigned_to")
     private User assignedTo;
-
-    @ManyToOne
-    @JoinColumn(name = "created_by", nullable = false)
-    private User createdBy;
 }
