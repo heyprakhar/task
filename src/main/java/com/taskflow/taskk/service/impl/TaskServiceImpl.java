@@ -2,7 +2,6 @@ package com.taskflow.taskk.service.impl;
 
 
 import com.taskflow.taskk.service.serviceInterface.TaskService;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -11,8 +10,10 @@ import com.taskflow.taskk.dto.responseDto.TaskResponseDto;
 import com.taskflow.taskk.repository.TaskRepository;
 import com.taskflow.taskk.repository.UserRepository;
 import com.taskflow.taskk.entity.Task;
+import com.taskflow.taskk.enums.TaskStatus;
 import com.taskflow.taskk.mapper.TaskMapper;
 import java.util.UUID;
+import com.taskflow.taskk.dto.requestDto.TaskStatusUpdateRequestDto;
 
 
 @Service
@@ -24,28 +25,26 @@ public class TaskServiceImpl implements TaskService {
     private final UserRepository userRepository;
 
     // create task - 
-    @Override
-    public TaskResponseDto createTask(TaskRequestDto taskRequestDto) {
+@Override
+public TaskResponseDto createTask(TaskRequestDto taskRequestDto) {
 
-        log.info("Creating task with title: {}", taskRequestDto.getTitle());
+    log.info("Creating task with title: {}", taskRequestDto.getTitle());
 
-        Task task = new Task();
-        task.setTitle(taskRequestDto.getTitle());
-        task.setDescription(taskRequestDto.getDescription());
-        task.setStatus(taskRequestDto.getStatus());
-        task.setPriority(taskRequestDto.getPriority());
+    Task task = new Task();
+    task.setTitle(taskRequestDto.getTitle());
+    task.setDescription(taskRequestDto.getDescription());
 
-        if (taskRequestDto.getAssignedTo() != null) {
-            userRepository.findById(taskRequestDto.getAssignedTo())
-                    .ifPresent(user -> task.setAssignedTo(user));
-        }
+    // set default status
+    task.setStatus(TaskStatus.PENDING);
 
-        Task savedTask = taskRepository.save(task);
+    task.setPriority(taskRequestDto.getPriority());
 
-        log.info("Task created successfully with id: {}", savedTask.getId());
+    Task savedTask = taskRepository.save(task);
 
-        return TaskMapper.toTaskResponseDto(savedTask);
-    }
+    log.info("Task created successfully with id: {}", savedTask.getId());
+
+    return TaskMapper.toTaskResponseDto(savedTask);
+}
 
     // assign task to a user - 
     public TaskResponseDto assignTaskToUser(UUID taskId, UUID userId) {
@@ -63,8 +62,18 @@ public class TaskServiceImpl implements TaskService {
                         },
                         () -> log.warn("User not found with id: {}", userId)
                 );
-
         return TaskMapper.toTaskResponseDto(task);    
     }
 
+    // update task status - 
+    public TaskResponseDto updateTaskStatus(UUID taskId, TaskStatusUpdateRequestDto taskStatusUpdateRequestDto) {
+        log.info("Updating status of task with id: {} to {}", taskId, taskStatusUpdateRequestDto.getStatus());
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Task not found with id: " + taskId));
+        task.setStatus(taskStatusUpdateRequestDto.getStatus());
+        Task updatedTask = taskRepository.save(task);
+        log.info("Status of task with id: {} updated successfully to {}", taskId,
+                taskStatusUpdateRequestDto.getStatus());
+        return TaskMapper.toTaskResponseDto(updatedTask);
+    }
 }

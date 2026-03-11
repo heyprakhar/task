@@ -14,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import java.util.UUID;
+import org.springframework.web.bind.annotation.PatchMapping;
+import com.taskflow.taskk.dto.requestDto.TaskStatusUpdateRequestDto;
 
 @RestController
 @AllArgsConstructor
@@ -41,5 +43,13 @@ public class TaskController {
         BaseApiResponse<TaskResponseDto> response = new BaseApiResponse<>(true, "Task assigned successfully", taskResponseDto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
+    
+    // update task status endpoint - 
+    @PatchMapping("/{taskId}/update-status")
+    public ResponseEntity<BaseApiResponse<TaskResponseDto>> updateTask(@PathVariable UUID taskId,
+            @RequestBody TaskStatusUpdateRequestDto taskStatusUpdateRequestDto) {
+        TaskResponseDto taskResponseDto = taskService.updateTaskStatus(taskId, taskStatusUpdateRequestDto);
+        BaseApiResponse<TaskResponseDto> response = new BaseApiResponse<>(true, "Task status updated successfully", taskResponseDto);
+        return new ResponseEntity<>(response, HttpStatus.OK);   
+    }
 }
