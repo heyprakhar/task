@@ -1,6 +1,6 @@
 package com.taskflow.taskk.service.impl;
 
-
+// import statements -
 import com.taskflow.taskk.service.serviceInterface.TaskService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +14,7 @@ import com.taskflow.taskk.enums.TaskStatus;
 import com.taskflow.taskk.mapper.TaskMapper;
 import java.util.UUID;
 import com.taskflow.taskk.dto.requestDto.TaskStatusUpdateRequestDto;
+import java.util.List;
 
 
 @Service
@@ -62,10 +63,11 @@ public TaskResponseDto createTask(TaskRequestDto taskRequestDto) {
                         },
                         () -> log.warn("User not found with id: {}", userId)
                 );
-        return TaskMapper.toTaskResponseDto(task);    
+        return TaskMapper.toTaskResponseDto(task);   
     }
 
     // update task status - 
+    @Override
     public TaskResponseDto updateTaskStatus(UUID taskId, TaskStatusUpdateRequestDto taskStatusUpdateRequestDto) {
         log.info("Updating status of task with id: {} to {}", taskId, taskStatusUpdateRequestDto.getStatus());
         Task task = taskRepository.findById(taskId)
@@ -75,5 +77,35 @@ public TaskResponseDto createTask(TaskRequestDto taskRequestDto) {
         log.info("Status of task with id: {} updated successfully to {}", taskId,
                 taskStatusUpdateRequestDto.getStatus());
         return TaskMapper.toTaskResponseDto(updatedTask);
+    }
+
+    // fetch all tasks -  useful for admins/project managers to see if any task is pending or in progress and take necessary actions- 
+   @Override
+    public List<TaskResponseDto> getAllTasks() {
+        log.info("fetching all tasks: {} to {}", taskRepository.findAll().size());
+        List<Task> tasks = taskRepository.findAll();
+        return tasks.stream()
+                .map(TaskMapper::toTaskResponseDto)
+                .toList();
+    }
+
+    // fetch tasks by user id - useful for users to see all their assigned tasks and manage them accordingly-
+    @Override
+    public List<TaskResponseDto> getTasksByUserId(UUID userId) {
+        log.info("fetching tasks for user with id: {}", userId);
+        List<Task> tasks = taskRepository.findByAssignedToId(userId);
+        return tasks.stream()
+                .map(TaskMapper::toTaskResponseDto)
+                .toList();
+    }
+
+
+    //  fetch task by id - useful for users to see details of a specific task and manage it effectively- 
+    @Override
+    public TaskResponseDto getTaskByID(UUID taskId) {
+        log.info("fetching task with id: {}", taskId);
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Task not found with id: " + taskId));
+        return TaskMapper.toTaskResponseDto(task);
     }
 }
