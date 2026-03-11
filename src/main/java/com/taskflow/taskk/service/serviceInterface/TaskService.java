@@ -30,4 +30,7 @@ public interface TaskService {
 
     // filter tasks by status and priority - useful for users to filter their tasks based on status and priority and manage them effectively-
     List<TaskResponseDto> filterTaskByStatusAndPriority(TaskStatus status, TaskPriority priority);
+
+    // delete task by id - useful for users to delete a task that is no longer needed or relevant-
+    void deleteTaskById(UUID taskId);
 }
