@@ -33,4 +33,7 @@ public interface TaskService {
 
     // delete task by id - useful for users to delete a task that is no longer needed or relevant-
     void deleteTaskById(UUID taskId);
+
+    // update task details - useful for users to update the details of a task such as title, description, and priority to keep the task information accurate and up-to-date-
+    TaskResponseDto updateTaskDetails(UUID taskId, TaskRequestDto taskRequestDto);
 }
