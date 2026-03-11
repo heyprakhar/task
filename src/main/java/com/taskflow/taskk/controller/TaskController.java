@@ -1,9 +1,12 @@
 package com.taskflow.taskk.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.taskflow.taskk.dto.requestDto.TaskRequestDto;
 import com.taskflow.taskk.dto.responseDto.TaskResponseDto;
+import com.taskflow.taskk.enums.TaskPriority;
+import com.taskflow.taskk.enums.TaskStatus;
 import com.taskflow.taskk.service.serviceInterface.TaskService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -55,13 +58,19 @@ public class TaskController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    // fetch all tasks -
-    @GetMapping("/fetch-tasks")
-    public ResponseEntity<BaseApiResponse<List<TaskResponseDto>>> fetchAllTasks() {
-        List<TaskResponseDto> tasks = taskService.getAllTasks();
-        BaseApiResponse<List<TaskResponseDto>> response = new BaseApiResponse<>(true, "Tasks fetched successfully", tasks);
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+// fetch all tasks or filter by status/priority
+@GetMapping("/fetch-tasks")
+public ResponseEntity<BaseApiResponse<List<TaskResponseDto>>> fetchTasks(
+        @RequestParam(required = false) TaskStatus status,
+        @RequestParam(required = false) TaskPriority priority) {
+
+    List<TaskResponseDto> tasks = taskService.filterTaskByStatusAndPriority(status, priority);
+
+    BaseApiResponse<List<TaskResponseDto>> response =
+            new BaseApiResponse<>(true, "Tasks fetched successfully", tasks);
+
+    return new ResponseEntity<>(response, HttpStatus.OK);
+}
 
     // fetch tasks by user -
     @GetMapping("/fetch-tasks/user/{userId}") 
