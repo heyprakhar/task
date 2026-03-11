@@ -18,4 +18,8 @@ public interface UserService {
     UserResponseDto updateUserById(UUID id, UserRequestDto userRequestDto);
 
     void deleteUserById(UUID id);
+
+    void activateUserAccount(UUID id);
+
+    void deactivateUserAccount(UUID id);
 }
