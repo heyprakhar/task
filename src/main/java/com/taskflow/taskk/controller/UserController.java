@@ -68,10 +68,26 @@ public class UserController {
 
      // delete user by Id endpoint- 
     @DeleteMapping("/delete-user/{id}")
-    public ResponseEntity<BaseApiResponse<Void>> deleteUserById(@PathVariable UUID id){
+    public ResponseEntity<BaseApiResponse<Void>> deleteUserById(@PathVariable UUID id) {
         userService.deleteUserById(id);
         BaseApiResponse<Void> response = new BaseApiResponse<>(true, "User deleted successfully", null);
         return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
     }
-   
+    
+    // activate user account endpoint-
+    @PatchMapping("/{id}/activate")
+    public ResponseEntity<BaseApiResponse<Void>> activateUserAccount(@PathVariable UUID id) {
+        userService.activateUserAccount(id);
+        BaseApiResponse<Void> response = new BaseApiResponse<>(true, "User account activated successfully", null);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    // deactivate user account endpoint-
+    @PatchMapping("/{id}/deactivate")
+    public ResponseEntity<BaseApiResponse<Void>> deactivateUserAccount(@PathVariable UUID id) {
+        userService.deactivateUserAccount(id);
+        BaseApiResponse<Void> response = new BaseApiResponse<>(true, "User account deactivated successfully", null);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+    
 }
