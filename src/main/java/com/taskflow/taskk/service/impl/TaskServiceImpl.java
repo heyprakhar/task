@@ -143,4 +143,20 @@ public class TaskServiceImpl implements TaskService {
                 .map(TaskMapper::toTaskResponseDto)
                 .toList();
     }
+
+    // delete task by id - 
+    @Override
+    public void deleteTaskById(UUID taskId) {
+        log.info("Deleting task with taskId={}", taskId);
+
+        if (!taskRepository.existsById(taskId)) {
+            throw new RuntimeException("Task not found with id: " + taskId);
+        }
+
+        taskRepository.deleteById(taskId);
+
+        log.info("Task deleted successfully with taskId={}", taskId); 
+
+    }
+
 }

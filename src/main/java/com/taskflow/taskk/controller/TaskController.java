@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import com.taskflow.taskk.dto.requestDto.TaskStatusUpdateRequestDto;
 import org.springframework.web.bind.annotation.GetMapping;
 import java.util.List;
+import org.springframework.web.bind.annotation.DeleteMapping;   
 
 @RestController
 @AllArgsConstructor
@@ -85,6 +86,14 @@ public ResponseEntity<BaseApiResponse<List<TaskResponseDto>>> fetchTasks(
     public ResponseEntity<BaseApiResponse<TaskResponseDto>> fetchTaskById(@PathVariable UUID taskId) {
         TaskResponseDto taskResponseDto = taskService.getTaskByID(taskId);
         BaseApiResponse<TaskResponseDto> response = new BaseApiResponse<>(true, "Task fetched successfully with id: " + taskId, taskResponseDto);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    // delete task by id -
+    @DeleteMapping("/delete-task/{taskId}")
+    public ResponseEntity<BaseApiResponse<Void>> deleteTaskById(@PathVariable UUID taskId) {
+        taskService.deleteTaskById(taskId);
+        BaseApiResponse<Void> response = new BaseApiResponse<>(true, "Task deleted successfully with id: " + taskId, null);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
