@@ -96,4 +96,14 @@ public ResponseEntity<BaseApiResponse<List<TaskResponseDto>>> fetchTasks(
         BaseApiResponse<Void> response = new BaseApiResponse<>(true, "Task deleted successfully with id: " + taskId, null);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    // update task details -
+    @PutMapping("/update-task/{taskId}")
+    public ResponseEntity<BaseApiResponse<TaskResponseDto>> updateTaskDetails(@PathVariable UUID taskId,
+            @RequestBody TaskRequestDto taskRequestDto) {
+        TaskResponseDto taskResponseDto = taskService.updateTaskDetails(taskId, taskRequestDto);
+        BaseApiResponse<TaskResponseDto> response = new BaseApiResponse<>(true,
+                "Task details updated successfully with id: " + taskId, taskResponseDto);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

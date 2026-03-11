@@ -159,4 +159,19 @@ public class TaskServiceImpl implements TaskService {
 
     }
 
+    // update task details - useful for users to update details of a specific task
+    // and manage it effectively-
+    @Override
+    public TaskResponseDto updateTaskDetails(UUID taskId, TaskRequestDto taskRequestDto) {
+        log.info("Updating details of task with id: {}", taskId);
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Task not found with id: " + taskId));
+        task.setTitle(taskRequestDto.getTitle());
+        task.setDescription(taskRequestDto.getDescription());
+        task.setPriority(taskRequestDto.getPriority());
+        Task updatedTask = taskRepository.save(task);
+        log.info("Details of task with id: {} updated successfully", taskId);
+        return TaskMapper.toTaskResponseDto(updatedTask);
+    }
+
 }
