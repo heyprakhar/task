@@ -89,5 +89,14 @@ public class UserController {
         BaseApiResponse<Void> response = new BaseApiResponse<>(true, "User account deactivated successfully", null);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    // fetch user by email endpoint-
+    @GetMapping("/email/{email}")
+    public ResponseEntity<BaseApiResponse<UserResponseDto>> getUserByEmail(@PathVariable String email) {
+        UserResponseDto userResponseDto = userService.fetchUserByEmail(email);
+        BaseApiResponse<UserResponseDto> response = new BaseApiResponse<>(true, "User fetched successfully",
+                userResponseDto);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
     
 }
