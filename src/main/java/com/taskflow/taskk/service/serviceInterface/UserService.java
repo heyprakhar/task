@@ -3,6 +3,7 @@ package com.taskflow.taskk.service.serviceInterface;
 
 import java.util.List;
 import java.util.UUID;
+import com.taskflow.taskk.dto.requestDto.LoginRequestDto;
 
 // import statements -
 import com.taskflow.taskk.dto.requestDto.UserRequestDto;
@@ -24,4 +25,6 @@ public interface UserService {
     void deactivateUserAccount(UUID id);
 
     UserResponseDto fetchUserByEmail(String email);
+
+    UserResponseDto validateCredentials(LoginRequestDto request);
 }

@@ -12,10 +12,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.UUID;
 import static com.taskflow.taskk.commonUtils.Constants.*;
-
+import com.taskflow.taskk.dto.requestDto.LoginRequestDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,6 +26,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+     private final PasswordEncoder passwordEncoder;
 
 
     // Create a new user with the default role- 
@@ -133,6 +135,20 @@ public class UserServiceImpl implements UserService {
         public UserResponseDto fetchUserByEmail(String email) {
             User user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+            return UserMapper.toUserResponseDto(user);
+        }
+
+        // validate user credentials-
+        @Override
+        public UserResponseDto validateCredentials(LoginRequestDto request) {
+
+            User user = userRepository.findByEmail(request.getEmail())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+                throw new RuntimeException("Invalid credentials");
+            }
+
             return UserMapper.toUserResponseDto(user);
         }
 }
