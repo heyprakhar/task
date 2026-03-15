@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
+
+import com.taskflow.taskk.dto.requestDto.LoginRequestDto;
 import com.taskflow.taskk.dto.requestDto.UserRequestDto;
 import com.taskflow.taskk.dto.responseDto.UserResponseDto;
 import com.taskflow.taskk.service.serviceInterface.UserService;
@@ -98,5 +100,14 @@ public class UserController {
                 userResponseDto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    // validate user credentials endpoint-
+    @PostMapping("/validate-credentials")
+public BaseApiResponse<UserResponseDto> validateCredentials(@RequestBody LoginRequestDto request){
+
+    UserResponseDto user = userService.validateCredentials(request);
+
+    return new BaseApiResponse<>(true,"Valid credentials", user );
+}
     
 }
