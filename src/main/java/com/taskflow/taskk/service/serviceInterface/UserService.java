@@ -22,4 +22,6 @@ public interface UserService {
     void activateUserAccount(UUID id);
 
     void deactivateUserAccount(UUID id);
+
+    UserResponseDto fetchUserByEmail(String email);
 }
