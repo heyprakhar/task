@@ -128,4 +128,11 @@ public class UserServiceImpl implements UserService {
             log.info("User account deactivated successfully for user ID: {}", id);
         }
 
+        // fetch user by email-
+        @Override
+        public UserResponseDto fetchUserByEmail(String email) {
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+            return UserMapper.toUserResponseDto(user);
+        }
 }
