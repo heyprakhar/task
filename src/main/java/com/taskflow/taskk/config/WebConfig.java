@@ -1,6 +1,6 @@
 package com.taskflow.taskk.config;
 
-import com.taskflow.taskk.receptor.RequestLoggingInterceptor;
+import com.taskflow.taskk.interceptor.RequestLoggingInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
