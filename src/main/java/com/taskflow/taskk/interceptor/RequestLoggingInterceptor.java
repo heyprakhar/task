@@ -1,4 +1,4 @@
-package com.taskflow.taskk.receptor;
+package com.taskflow.taskk.interceptor;
 
 
 import jakarta.servlet.http.HttpServletRequest;

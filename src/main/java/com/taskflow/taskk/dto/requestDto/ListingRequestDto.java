@@ -43,4 +43,6 @@ public class ListingRequestDto {
 
     private String toDate;
 
+    private String direction;
+
 }
