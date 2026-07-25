@@ -3,6 +3,8 @@ package com.taskflow.taskk.service.impl;
 import com.taskflow.taskk.dto.TaskDTO;
 import com.taskflow.taskk.dto.responseDto.ListResponseDTO;
 import com.taskflow.taskk.entity.Task;
+import com.taskflow.taskk.exceptions.BusinessException;
+import com.taskflow.taskk.exceptions.ErrorCode;
 import com.taskflow.taskk.mapper.TaskMapper;
 import com.taskflow.taskk.repository.TaskRepository;
 import com.taskflow.taskk.request.ParamRequest;
@@ -74,6 +76,48 @@ public class TaskServiceImpl implements TaskService {
                 .total(taskRepository.count(spec))
                 .records(taskDTOS)
                 .build();
+    }
+
+    @Override
+    public TaskDTO createTask(TaskDTO taskDTO, String userEmail) {
+        Task task = TaskMapper.toEntity(taskDTO);
+        taskRepository.save(task);
+        return TaskMapper.toDto(task);
+    }
+
+    @Override
+    public TaskDTO getTaskById(Long taskId, String userEmail) {
+
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.BAD_REQUEST, "A task with the given identifier couldn't be found."));
+
+        return TaskMapper.toDto(task);
+    }
+
+
+    @Override
+    public TaskDTO updateTask(String userEmail, TaskDTO taskDTO, Long taskId) {
+
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND, "Task not found."));
+
+        TaskMapper.updateEntity(task, taskDTO);
+        taskRepository.save(task);
+
+        return TaskMapper.toDto(task);
+    }
+
+    @Override
+    public void deleteTaskById(Long taskId, String userEmail) {
+
+        if (taskId == null) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "Task id must not be null.");
+        }
+
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND, "Task not found with the given identifier."));
+
+        taskRepository.delete(task);
     }
 
 }

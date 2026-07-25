@@ -13,7 +13,7 @@ import java.util.List;
 
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long>,JpaSpecificationExecutor<Task> {
-     List<Task> findByAssignedToId(Long userId);
+     List<Task> findByAssignedTo(Long userId);
 
      List<Task> findByStatusAndPriority(TaskStatus status, TaskPriority priority);
      
