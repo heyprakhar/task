@@ -8,9 +8,10 @@ import org.springframework.stereotype.Repository;
 import com.taskflow.taskk.entity.Task;
 import com.taskflow.taskk.enums.TaskStatus;
 import com.taskflow.taskk.enums.TaskPriority;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 @Repository
-public interface TaskRepository extends JpaRepository<Task, UUID> {
+public interface TaskRepository extends JpaRepository<Task, UUID>,JpaSpecificationExecutor<Task> {
      List<Task> findByAssignedToId(UUID userId);
 
      List<Task> findByStatusAndPriority(TaskStatus status, TaskPriority priority);
