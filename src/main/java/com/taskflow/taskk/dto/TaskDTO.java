@@ -1,13 +1,15 @@
-package com.taskflow.taskk.dto.responseDto;
+package com.taskflow.taskk.dto;
 
 import com.taskflow.taskk.enums.TaskPriority;
 import com.taskflow.taskk.enums.TaskStatus;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Data
-public class TaskResponseDto {
+@Builder
+public class TaskDTO {
 
     private Long id;
 

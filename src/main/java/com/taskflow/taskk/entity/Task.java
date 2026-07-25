@@ -5,11 +5,17 @@ import com.taskflow.taskk.enums.TaskPriority;
 import com.taskflow.taskk.enums.TaskStatus;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
 @Table(name = "tasks")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Task extends BaseEntity {
 
     @Column(nullable = false)
