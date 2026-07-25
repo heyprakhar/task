@@ -1,27 +1,22 @@
 package com.taskflow.taskk.service.impl;
 
 // import statements
+
+import com.taskflow.taskk.dto.requestDto.TaskRequestDto;
+import com.taskflow.taskk.dto.requestDto.TaskStatusUpdateRequestDto;
+import com.taskflow.taskk.dto.responseDto.TaskResponseDto;
+import com.taskflow.taskk.entity.Task;
+import com.taskflow.taskk.entity.User;
+import com.taskflow.taskk.enums.TaskPriority;
+import com.taskflow.taskk.enums.TaskStatus;
+import com.taskflow.taskk.mapper.TaskMapper;
+import com.taskflow.taskk.repository.TaskRepository;
+import com.taskflow.taskk.repository.UserRepository;
 import com.taskflow.taskk.service.serviceInterface.TaskService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import com.taskflow.taskk.dto.requestDto.TaskRequestDto;
-import com.taskflow.taskk.dto.requestDto.TaskStatusUpdateRequestDto;
-import com.taskflow.taskk.dto.responseDto.TaskResponseDto;
-
-import com.taskflow.taskk.repository.TaskRepository;
-import com.taskflow.taskk.repository.UserRepository;
-
-import com.taskflow.taskk.entity.Task;
-import com.taskflow.taskk.entity.User;
-
-import com.taskflow.taskk.enums.TaskPriority;
-import com.taskflow.taskk.enums.TaskStatus;
-
-import com.taskflow.taskk.mapper.TaskMapper;
-
-import java.util.UUID;
 import java.util.List;
 
 @Service
@@ -56,7 +51,7 @@ public class TaskServiceImpl implements TaskService {
 
     // assign task to user
     @Override
-    public TaskResponseDto assignTaskToUser(UUID taskId, UUID userId) {
+    public TaskResponseDto assignTaskToUser(Long taskId, Long userId) {
 
         log.info("Assigning taskId={} to userId={}", taskId, userId);
 
@@ -77,7 +72,7 @@ public class TaskServiceImpl implements TaskService {
 
     // update task status
     @Override
-    public TaskResponseDto updateTaskStatus(UUID taskId, TaskStatusUpdateRequestDto taskStatusUpdateRequestDto) {
+    public TaskResponseDto updateTaskStatus(Long taskId, TaskStatusUpdateRequestDto taskStatusUpdateRequestDto) {
 
         log.info("Updating task status taskId={} newStatus={}", taskId, taskStatusUpdateRequestDto.getStatus());
 
@@ -96,7 +91,7 @@ public class TaskServiceImpl implements TaskService {
 
     // fetch tasks by user id
     @Override
-    public List<TaskResponseDto> getTasksByUserId(UUID userId) {
+    public List<TaskResponseDto> getTasksByUserId(Long userId) {
 
         log.info("Fetching tasks for userId={}", userId);
 
@@ -109,7 +104,7 @@ public class TaskServiceImpl implements TaskService {
 
     // fetch task by id
     @Override
-    public TaskResponseDto getTaskByID(UUID taskId) {
+    public TaskResponseDto getTaskByID(Long taskId) {
 
         log.info("Fetching task with taskId={}", taskId);
 
@@ -123,8 +118,6 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public List<TaskResponseDto> filterTaskByStatusAndPriority(TaskStatus status, TaskPriority priority) {
 
-        log.info("Filtering tasks status={} priority={}", status, priority);
-
         List<Task> tasks;
 
         if (status != null && priority != null) {
@@ -137,8 +130,6 @@ public class TaskServiceImpl implements TaskService {
             tasks = taskRepository.findAll();
         }
 
-        log.info("Filtered tasks count={}", tasks.size());
-
         return tasks.stream()
                 .map(TaskMapper::toTaskResponseDto)
                 .toList();
@@ -146,7 +137,7 @@ public class TaskServiceImpl implements TaskService {
 
     // delete task by id - 
     @Override
-    public void deleteTaskById(UUID taskId) {
+    public void deleteTaskById(Long taskId) {
         log.info("Deleting task with taskId={}", taskId);
 
         if (!taskRepository.existsById(taskId)) {
@@ -162,7 +153,7 @@ public class TaskServiceImpl implements TaskService {
     // update task details - useful for users to update details of a specific task
     // and manage it effectively-
     @Override
-    public TaskResponseDto updateTaskDetails(UUID taskId, TaskRequestDto taskRequestDto) {
+    public TaskResponseDto updateTaskDetails(Long taskId, TaskRequestDto taskRequestDto) {
         log.info("Updating details of task with id: {}", taskId);
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new RuntimeException("Task not found with id: " + taskId));
