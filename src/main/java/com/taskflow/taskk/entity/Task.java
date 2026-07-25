@@ -10,6 +10,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Data
 @Table(name = "tasks")
@@ -32,7 +34,8 @@ public class Task extends BaseEntity {
     @Column(name = "priority")
     private TaskPriority priority;
 
-    @ManyToOne
-    @JoinColumn(name = "assigned_to")
-    private User assignedTo;
+    @Column(name = "assigned_to")
+    private Long assignedTo;
+
+    private LocalDateTime dueDate;
 }
