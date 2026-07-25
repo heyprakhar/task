@@ -20,7 +20,7 @@ public class TaskMapper {
                 .description(task.getDescription())
                 .status(task.getStatus())
                 .priority(task.getPriority())
-                .assignedTo(task.getAssignedTo() != null ? task.getAssignedTo().getId() : null)
+                .assignedTo(task.getAssignedTo() != null ? task.getAssignedTo() : null)
                 .createdAt(task.getCreatedAt())
                 .updatedAt(task.getUpdatedAt())
                 .build();
@@ -41,9 +41,33 @@ public class TaskMapper {
         if (taskDTO.getAssignedTo() != null) {
             User user = new User();
             user.setId(taskDTO.getAssignedTo());
-            task.setAssignedTo(user);
+            task.setAssignedTo(user.getId());
         }
 
         return task;
+    }
+
+    public static void updateEntity(Task task, TaskDTO taskDTO) {
+
+        if (taskDTO.getTitle() != null) {
+            task.setTitle(taskDTO.getTitle());
+        }
+
+        if (taskDTO.getDescription() != null) {
+            task.setDescription(taskDTO.getDescription());
+        }
+
+        if (taskDTO.getStatus() != null) {
+            task.setStatus(taskDTO.getStatus());
+        }
+
+        if (taskDTO.getPriority() != null) {
+            task.setPriority(taskDTO.getPriority());
+        }
+
+        if (taskDTO.getDueDate() != null) {
+            task.setDueDate(taskDTO.getDueDate());
+        }
+
     }
 }

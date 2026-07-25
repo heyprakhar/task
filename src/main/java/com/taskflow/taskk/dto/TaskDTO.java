@@ -1,5 +1,6 @@
 package com.taskflow.taskk.dto;
 
+import com.taskflow.taskk.entity.User;
 import com.taskflow.taskk.enums.TaskPriority;
 import com.taskflow.taskk.enums.TaskStatus;
 import lombok.Builder;
