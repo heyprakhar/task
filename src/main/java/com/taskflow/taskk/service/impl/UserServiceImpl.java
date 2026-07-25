@@ -1,5 +1,6 @@
 package com.taskflow.taskk.service.impl;
 
+import com.taskflow.taskk.dto.requestDto.LoginRequestDto;
 import com.taskflow.taskk.dto.requestDto.UserRequestDto;
 import com.taskflow.taskk.dto.responseDto.UserResponseDto;
 import com.taskflow.taskk.entity.Role;
@@ -8,16 +9,15 @@ import com.taskflow.taskk.mapper.UserMapper;
 import com.taskflow.taskk.repository.RoleRepository;
 import com.taskflow.taskk.repository.UserRepository;
 import com.taskflow.taskk.service.serviceInterface.UserService;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.UUID;
-import static com.taskflow.taskk.commonUtils.Constants.*;
-import com.taskflow.taskk.dto.requestDto.LoginRequestDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.taskflow.taskk.commonUtils.Constants.ROLE_USER;
 
 @Service
 @AllArgsConstructor
@@ -74,7 +74,7 @@ public class UserServiceImpl implements UserService {
                     .collect(Collectors.toList());  
     }
     // fetch user by Id-
-    public UserResponseDto fetchUserById(UUID id) {
+    public UserResponseDto fetchUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
         return UserMapper.toUserResponseDto(user);
@@ -84,7 +84,7 @@ public class UserServiceImpl implements UserService {
     
     // update user details-
         @Override
-        public UserResponseDto updateUserById(UUID id, UserRequestDto userRequestDto){
+        public UserResponseDto updateUserById(Long id, UserRequestDto userRequestDto){
             User user = userRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
             user.setName(userRequestDto.getName());
@@ -96,7 +96,7 @@ public class UserServiceImpl implements UserService {
 
         // delete user by Id- 
         @Override
-        public void deleteUserById(UUID id){
+        public void deleteUserById(Long id){
             User user = userRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
             userRepository.delete(user);
@@ -104,7 +104,7 @@ public class UserServiceImpl implements UserService {
 
         // activate user account -
         @Override
-        public void activateUserAccount(UUID id) {
+        public void activateUserAccount(Long id) {
             User user = userRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
             if (user.isActive()) {
@@ -118,7 +118,7 @@ public class UserServiceImpl implements UserService {
 
         // deactivate user account -
         @Override
-        public void deactivateUserAccount(UUID id) {
+        public void deactivateUserAccount(Long id) {
             User user = userRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
             if (!user.isActive()) {

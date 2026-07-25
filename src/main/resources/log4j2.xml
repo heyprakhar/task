@@ -3,12 +3,12 @@
 <Configuration status="WARN">
 
     <Appenders>
-
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout
-                pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %msg%n" />
+                    disableAnsi="false"
+                    noConsoleNoAnsi="false"
+                    pattern="%style{%d{yyyy-MM-dd HH:mm:ss}}{green} %style{[%X{traceId}]}{yellow} %highlight{%-5level} %style{[%X{method} %X{path}]}{magenta} - %msg%n"/>
         </Console>
-
     </Appenders>
 
     <Loggers>
