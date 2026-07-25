@@ -1,13 +1,8 @@
 package com.taskflow.taskk.entity;
 
 import com.taskflow.taskk.common.entity.BaseEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.Data;
-import jakarta.persistence.Table;
-import jakarta.persistence.Column;
-import jakarta.persistence.FetchType;
 
 
 @Table(name = "users")

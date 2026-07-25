@@ -1,7 +1,7 @@
 package com.taskflow.taskk.dto.requestDto;
 
-import lombok.Data;
 import com.taskflow.taskk.enums.TaskPriority;
+import lombok.Data;
 
 @Data
 public class TaskRequestDto {

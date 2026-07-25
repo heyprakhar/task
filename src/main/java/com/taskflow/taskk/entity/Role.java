@@ -1,11 +1,12 @@
 package com.taskflow.taskk.entity;
 
 // import statements - 
+
 import com.taskflow.taskk.common.entity.BaseEntity;
-import jakarta.persistence.Entity;
-import lombok.Data;
-import jakarta.persistence.Table;
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.Data;
 
 @Entity
 @Data

@@ -1,28 +1,28 @@
 package com.taskflow.taskk.service.serviceInterface;
 
 
-import java.util.List;
-import java.util.UUID;
 import com.taskflow.taskk.dto.requestDto.LoginRequestDto;
-
-// import statements -
 import com.taskflow.taskk.dto.requestDto.UserRequestDto;
 import com.taskflow.taskk.dto.responseDto.UserResponseDto;
+
+import java.util.List;
+
+// import statements -
 
 public interface UserService {
     UserResponseDto createUser(UserRequestDto userRequestDto);
 
     List<UserResponseDto> fetchAllUsers();
         
-    UserResponseDto fetchUserById(UUID id);
+    UserResponseDto fetchUserById(Long id);
 
-    UserResponseDto updateUserById(UUID id, UserRequestDto userRequestDto);
+    UserResponseDto updateUserById(Long id, UserRequestDto userRequestDto);
 
-    void deleteUserById(UUID id);
+    void deleteUserById(Long id);
 
-    void activateUserAccount(UUID id);
+    void activateUserAccount(Long id);
 
-    void deactivateUserAccount(UUID id);
+    void deactivateUserAccount(Long id);
 
     UserResponseDto fetchUserByEmail(String email);
 

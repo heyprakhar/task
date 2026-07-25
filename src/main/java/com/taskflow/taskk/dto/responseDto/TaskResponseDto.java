@@ -1,16 +1,15 @@
 package com.taskflow.taskk.dto.responseDto;
 
-import lombok.Data;
 import com.taskflow.taskk.enums.TaskPriority;
 import com.taskflow.taskk.enums.TaskStatus;
+import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Data
 public class TaskResponseDto {
 
-    private UUID id;
+    private Long id;
 
     private String title;
 
@@ -20,7 +19,7 @@ public class TaskResponseDto {
 
     private TaskPriority priority;
 
-    private UUID assignedTo;
+    private Long assignedTo;
 
     private LocalDateTime dueDate;
 
