@@ -1,20 +1,18 @@
 package com.taskflow.taskk.service.impl;
 
-// import statements
-
-import com.taskflow.taskk.dto.requestDto.TaskRequestDto;
-import com.taskflow.taskk.dto.requestDto.TaskStatusUpdateRequestDto;
-import com.taskflow.taskk.dto.responseDto.TaskResponseDto;
+import com.taskflow.taskk.dto.TaskDTO;
+import com.taskflow.taskk.dto.responseDto.ListResponseDTO;
 import com.taskflow.taskk.entity.Task;
-import com.taskflow.taskk.entity.User;
-import com.taskflow.taskk.enums.TaskPriority;
-import com.taskflow.taskk.enums.TaskStatus;
 import com.taskflow.taskk.mapper.TaskMapper;
 import com.taskflow.taskk.repository.TaskRepository;
-import com.taskflow.taskk.repository.UserRepository;
+import com.taskflow.taskk.request.ParamRequest;
 import com.taskflow.taskk.service.serviceInterface.TaskService;
+import com.taskflow.taskk.specification.TaskSpecification;
+import com.taskflow.taskk.utils.CommonUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,144 +23,57 @@ import java.util.List;
 public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
-    private final UserRepository userRepository;
 
-    // create task
     @Override
-    public TaskResponseDto createTask(TaskRequestDto taskRequestDto) {
+    public ListResponseDTO<TaskDTO> getAllTasks(String userEmail, ParamRequest request) {
 
-        log.info("Creating task with title={}", taskRequestDto.getTitle());
+        Specification<Task> spec = Specification.allOf(
+                TaskSpecification.entityStateIn(request.getEntityState())
+        );
 
-        Task task = new Task();
-        task.setTitle(taskRequestDto.getTitle());
-        task.setDescription(taskRequestDto.getDescription());
+        List<TaskDTO> taskDTOS = List.of();
 
-        // default status
-        task.setStatus(TaskStatus.PENDING);
+        if(request.isRecords()){
+            request.setSortBy(request.getSortBy() == null ? "title" :request.getSortBy());
 
-        task.setPriority(taskRequestDto.getPriority());
+            Page<Task> tasks = taskRepository.findAll(spec, CommonUtils.buildPageRequest(request));
 
-        Task savedTask = taskRepository.save(task);
-
-        log.info("Task created successfully with id={}", savedTask.getId());
-
-        return TaskMapper.toTaskResponseDto(savedTask);
-    }
-
-    // assign task to user
-    @Override
-    public TaskResponseDto assignTaskToUser(Long taskId, Long userId) {
-
-        log.info("Assigning taskId={} to userId={}", taskId, userId);
-
-        Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new RuntimeException("Task not found with id: " + taskId));
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
-
-        task.setAssignedTo(user);
-
-        Task updatedTask = taskRepository.save(task);
-
-        log.info("Task assigned successfully taskId={} userId={}", taskId, userId);
-
-        return TaskMapper.toTaskResponseDto(updatedTask);
-    }
-
-    // update task status
-    @Override
-    public TaskResponseDto updateTaskStatus(Long taskId, TaskStatusUpdateRequestDto taskStatusUpdateRequestDto) {
-
-        log.info("Updating task status taskId={} newStatus={}", taskId, taskStatusUpdateRequestDto.getStatus());
-
-        Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new RuntimeException("Task not found with id: " + taskId));
-
-        task.setStatus(taskStatusUpdateRequestDto.getStatus());
-
-        Task updatedTask = taskRepository.save(task);
-
-        log.info("Task status updated successfully taskId={} status={}",
-                taskId, taskStatusUpdateRequestDto.getStatus());
-
-        return TaskMapper.toTaskResponseDto(updatedTask);
-    }
-
-    // fetch tasks by user id
-    @Override
-    public List<TaskResponseDto> getTasksByUserId(Long userId) {
-
-        log.info("Fetching tasks for userId={}", userId);
-
-        List<Task> tasks = taskRepository.findByAssignedToId(userId);
-
-        return tasks.stream()
-                .map(TaskMapper::toTaskResponseDto)
-                .toList();
-    }
-
-    // fetch task by id
-    @Override
-    public TaskResponseDto getTaskByID(Long taskId) {
-
-        log.info("Fetching task with taskId={}", taskId);
-
-        Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new RuntimeException("Task not found with id: " + taskId));
-
-        return TaskMapper.toTaskResponseDto(task);
-    }
-
-    // filter tasks by status and priority
-    @Override
-    public List<TaskResponseDto> filterTaskByStatusAndPriority(TaskStatus status, TaskPriority priority) {
-
-        List<Task> tasks;
-
-        if (status != null && priority != null) {
-            tasks = taskRepository.findByStatusAndPriority(status, priority);
-        } else if (status != null) {
-            tasks = taskRepository.findByStatus(status);
-        } else if (priority != null) {
-            tasks = taskRepository.findByPriority(priority);
-        } else {
-            tasks = taskRepository.findAll();
+            taskDTOS = tasks.getContent()
+                    .stream()
+                    .map(TaskMapper ::toDto)
+                    .toList();
         }
 
-        return tasks.stream()
-                .map(TaskMapper::toTaskResponseDto)
-                .toList();
+        return ListResponseDTO.<TaskDTO>builder()
+                .total(taskRepository.count(spec))
+                .records(taskDTOS)
+                .build();
     }
 
-    // delete task by id - 
     @Override
-    public void deleteTaskById(Long taskId) {
-        log.info("Deleting task with taskId={}", taskId);
+    public ListResponseDTO<TaskDTO> getAllTasks(ParamRequest request) {
 
-        if (!taskRepository.existsById(taskId)) {
-            throw new RuntimeException("Task not found with id: " + taskId);
+        Specification<Task> spec = Specification.allOf(
+                TaskSpecification.entityStateIn(request.getEntityState())
+        );
+
+        List<TaskDTO> taskDTOS = List.of();
+
+        if(request.isRecords()){
+            request.setSortBy(request.getSortBy() == null ? "name" :request.getSortBy());
+
+            Page<Task> tasks = taskRepository.findAll(spec, CommonUtils.buildPageRequest(request));
+
+            taskDTOS = tasks.getContent()
+                    .stream()
+                    .map(TaskMapper ::toDto)
+                    .toList();
         }
 
-        taskRepository.deleteById(taskId);
-
-        log.info("Task deleted successfully with taskId={}", taskId); 
-
-    }
-
-    // update task details - useful for users to update details of a specific task
-    // and manage it effectively-
-    @Override
-    public TaskResponseDto updateTaskDetails(Long taskId, TaskRequestDto taskRequestDto) {
-        log.info("Updating details of task with id: {}", taskId);
-        Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new RuntimeException("Task not found with id: " + taskId));
-        task.setTitle(taskRequestDto.getTitle());
-        task.setDescription(taskRequestDto.getDescription());
-        task.setPriority(taskRequestDto.getPriority());
-        Task updatedTask = taskRepository.save(task);
-        log.info("Details of task with id: {} updated successfully", taskId);
-        return TaskMapper.toTaskResponseDto(updatedTask);
+        return ListResponseDTO.<TaskDTO>builder()
+                .total(taskRepository.count(spec))
+                .records(taskDTOS)
+                .build();
     }
 
 }

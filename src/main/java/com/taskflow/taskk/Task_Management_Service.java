@@ -8,11 +8,11 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 @Slf4j
 @EnableDiscoveryClient
 @SpringBootApplication
-public class TaskkApplication {
+public class Task_Management_Service {
 
 	public static void main(String[] args) {
         log.info("Application started successfully");
-		SpringApplication.run(TaskkApplication.class, args);
+		SpringApplication.run(Task_Management_Service.class, args);
 	}
 
 }
