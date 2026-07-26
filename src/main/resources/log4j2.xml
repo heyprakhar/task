@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <Configuration status="WARN">
 
     <Appenders>
@@ -7,16 +6,14 @@
             <PatternLayout
                     disableAnsi="false"
                     noConsoleNoAnsi="false"
-                    pattern="%style{%d{yyyy-MM-dd HH:mm:ss}}{green} %style{[%X{traceId}]}{yellow} %highlight{%-5level} %style{[%X{method} %X{path}]}{magenta} - %msg%n"/>
+                    pattern="%style{%d{yyyy-MM-dd HH:mm:ss}}{green} %style{[%X{traceId}]}{yellow} %style{[%t]}{blue} %highlight{%-5level} %style{[%X{method} %X{path}]}{magenta} %style{[%c{1}.%M]}{blue} - %msg%n"/>
         </Console>
     </Appenders>
 
     <Loggers>
-
         <Root level="info">
-            <AppenderRef ref="Console" />
+            <AppenderRef ref="Console"/>
         </Root>
-
     </Loggers>
 
 </Configuration>

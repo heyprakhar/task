@@ -23,6 +23,7 @@ public class TaskMapper {
                 .assignedTo(task.getAssignedTo() != null ? task.getAssignedTo() : null)
                 .createdAt(task.getCreatedAt())
                 .updatedAt(task.getUpdatedAt())
+                .createdBy(task.getCreatedBy())
                 .build();
     }
 
