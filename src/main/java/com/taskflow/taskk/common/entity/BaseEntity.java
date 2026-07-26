@@ -1,6 +1,7 @@
 package com.taskflow.taskk.common.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
