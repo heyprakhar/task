@@ -14,6 +14,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.stream.Collectors;
 
@@ -127,6 +128,12 @@ public class GlobalExceptionHandler {
                 ErrorCode.METHOD_NOT_ALLOWED,
                 ex.getMessage()
         );
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public BaseApiResponse<Void> handleNoResourceFound(NoResourceFoundException ex) {
+
+        return buildResponse(ErrorCode.RESOURCE_NOT_FOUND, "No resource found for " + ex.getResourcePath());
     }
 
     @ExceptionHandler(Exception.class)

@@ -19,6 +19,9 @@ public class ParamRequest extends ListingRequestDto{
     private List<String> entityState;
     private List<String> entityType;
     private Boolean records = Boolean.FALSE;
+    private Boolean activeUser;
+    private Long userRoleId;
+    private String search;
 
     public boolean isRecords() { return Boolean.TRUE.equals(records); }
 

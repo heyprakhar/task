@@ -1,6 +1,7 @@
 package com.taskflow.taskk.service.impl;
 
 import com.taskflow.taskk.dto.TaskDTO;
+import com.taskflow.taskk.dto.UserDTO;
 import com.taskflow.taskk.dto.responseDto.ListResponseDTO;
 import com.taskflow.taskk.entity.Task;
 import com.taskflow.taskk.exceptions.BusinessException;
@@ -9,6 +10,7 @@ import com.taskflow.taskk.mapper.TaskMapper;
 import com.taskflow.taskk.repository.TaskRepository;
 import com.taskflow.taskk.request.ParamRequest;
 import com.taskflow.taskk.service.serviceInterface.TaskService;
+import com.taskflow.taskk.service.serviceInterface.UserService;
 import com.taskflow.taskk.specification.TaskSpecification;
 import com.taskflow.taskk.utils.CommonUtils;
 import lombok.AllArgsConstructor;
@@ -25,6 +27,7 @@ import java.util.List;
 public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
+    private final UserService userService;
 
     @Override
     public ListResponseDTO<TaskDTO> getAllTasks(String userEmail, ParamRequest request) {
@@ -80,7 +83,9 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public TaskDTO createTask(TaskDTO taskDTO, String userEmail) {
+        UserDTO userDTO = userService.getUserByEmailInternal(userEmail);
         Task task = TaskMapper.toEntity(taskDTO);
+        task.setCreatedBy(userDTO.getId());
         taskRepository.save(task);
         return TaskMapper.toDto(task);
     }
