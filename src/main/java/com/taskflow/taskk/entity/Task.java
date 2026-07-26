@@ -37,5 +37,7 @@ public class Task extends BaseEntity {
     @Column(name = "assigned_to")
     private Long assignedTo;
 
+    private Long createdBy;
+
     private LocalDateTime dueDate;
 }
