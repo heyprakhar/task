@@ -66,7 +66,7 @@ public class UserServiceImpl implements UserService {
         List<UserDTO> userDTOS = List.of();
 
         Specification<User> spec = Specification.allOf(
-                UserSpecification.hasActiveStatus(request.getActiveUser()),
+                UserSpecification.hasActiveStatus(request.getActive()),
                 UserSpecification.hasRoleId(request.getUserRoleId()),
                 UserSpecification.search(request.getSearch())
         );
