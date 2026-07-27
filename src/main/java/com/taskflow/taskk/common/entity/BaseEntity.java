@@ -22,7 +22,6 @@ public abstract class BaseEntity {
     @PrePersist
     public void prePersist() {
         createdAt = LocalDateTime.now();
-        updatedAt = createdAt;
     }
 
     @PreUpdate
