@@ -26,7 +26,7 @@ public class GlobalExceptionHandler {
 
         HttpStatus status = ex.getStatus() != null
                 ? ex.getStatus()
-                : HttpStatus.BAD_REQUEST;
+                : HttpStatus.INTERNAL_SERVER_ERROR;
 
         return BaseApiResponse.<Void>builder()
                 .status(status.value())

@@ -44,7 +44,7 @@ public class BusinessException extends RuntimeException {
         super(reason);
         this.code = code;
         this.reason = reason;
-        this.message = code.getDefaultMessage();
+        this.message = reason;
         this.status = code.getHttpStatus();
     }
 
