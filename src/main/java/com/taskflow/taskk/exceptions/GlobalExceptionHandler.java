@@ -2,6 +2,7 @@ package com.taskflow.taskk.exceptions;
 
 import com.taskflow.taskk.common.response.BaseApiResponse;
 import jakarta.validation.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -77,6 +78,25 @@ public class GlobalExceptionHandler {
                 ErrorCode.CONSTRAINT_VIOLATION,
                 reason
         );
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<BaseApiResponse<Void>> handleDataIntegrityViolation(
+            DataIntegrityViolationException ex) {
+
+        String message = "Database constraint violation.";
+
+        if (ex.getMostSpecificCause().getMessage().contains("Duplicate entry")) {
+            message = "Resource already exists.";
+        }
+
+        BaseApiResponse<Void> response = BaseApiResponse.<Void>builder()
+                .status(HttpStatus.CONFLICT.value())
+                .message(message)
+                .data(null)
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)

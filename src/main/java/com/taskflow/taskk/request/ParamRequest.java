@@ -19,7 +19,7 @@ public class ParamRequest extends ListingRequestDto{
     private List<String> entityState;
     private List<String> entityType;
     private Boolean records = Boolean.FALSE;
-    private Boolean activeUser;
+    private Boolean active;
     private Long userRoleId;
     private String search;
 
