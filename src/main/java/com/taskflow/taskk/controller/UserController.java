@@ -2,6 +2,7 @@ package com.taskflow.taskk.controller;
 
 import com.taskflow.taskk.common.response.BaseApiResponse;
 import com.taskflow.taskk.dto.UserDTO;
+import com.taskflow.taskk.dto.UserIdsRequest;
 import com.taskflow.taskk.dto.responseDto.ListResponseDTO;
 import com.taskflow.taskk.request.ParamRequest;
 import com.taskflow.taskk.service.serviceInterface.UserService;
@@ -70,6 +71,34 @@ public class UserController {
                 BaseApiResponse.<UserDTO>builder()
                         .status(HttpStatus.OK.value())
                         .message("User updated successfully")
+                        .data(response)
+                        .build()
+        );
+    }
+
+    @PatchMapping("/deactivate")
+    public ResponseEntity<BaseApiResponse<ListResponseDTO<UserDTO>>> deactivateUsers(@RequestBody UserIdsRequest request, @RequestHeader(HEADER_USERID) String userEmail) {
+
+        ListResponseDTO<UserDTO> response = userService.deactivateUsersByUserIds(request.getUserIds(), userEmail);
+
+        return ResponseEntity.ok(
+                BaseApiResponse.<ListResponseDTO<UserDTO>>builder()
+                        .status(HttpStatus.OK.value())
+                        .message("Users deactivated successfully")
+                        .data(response)
+                        .build()
+        );
+    }
+
+    @PatchMapping("/activate")
+    public ResponseEntity<BaseApiResponse<ListResponseDTO<UserDTO>>> activateUsers(@RequestBody UserIdsRequest request, @RequestHeader(HEADER_USERID) String userEmail) {
+
+        ListResponseDTO<UserDTO> response = userService.activateUsersByUserIds(request.getUserIds(), userEmail);
+
+        return ResponseEntity.ok(
+                BaseApiResponse.<ListResponseDTO<UserDTO>>builder()
+                        .status(HttpStatus.OK.value())
+                        .message("Users activated successfully")
                         .data(response)
                         .build()
         );

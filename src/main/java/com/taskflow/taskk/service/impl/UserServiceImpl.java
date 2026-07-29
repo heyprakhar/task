@@ -18,6 +18,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 
@@ -124,6 +125,75 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.BAD_REQUEST, "User not found"));
 
         return UserMapper.toDto(user);
+    }
+
+    @Override
+    public ListResponseDTO<UserDTO> deactivateUsersByUserIds(List<Long> userIds, String userEmail) {
+
+        log.info("Deactivating users with IDs: {}", userIds);
+        getUserByEmailInternal(userEmail);
+
+
+        if (ObjectUtils.isEmpty(userIds)) {
+            return ListResponseDTO.<UserDTO>builder()
+                    .total(0L)
+                    .records(List.of())
+                    .build();
+        }
+
+        List<User> users = userRepository.findAllById(userIds);
+
+        if (users.size() != userIds.size()) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "One or more user IDs are invalid.");
+        }
+
+        List<User> updatedUsers = userRepository.saveAll(users.stream().peek(user -> user.setActive(false)).toList());
+
+        return ListResponseDTO.<UserDTO>builder()
+                .total((long) updatedUsers.size())
+                .records(updatedUsers.stream().map(UserMapper::toDto).toList())
+                .build();
+    }
+
+    @Override
+    public ListResponseDTO<UserDTO> activateUsersByUserIds(List<Long> userIds, String userEmail) {
+
+        log.info("Activating users with IDs: {}", userIds);
+        getUserByEmailInternal(userEmail);
+
+
+        if (ObjectUtils.isEmpty(userIds)) {
+            return ListResponseDTO.<UserDTO>builder()
+                    .total(0L)
+                    .records(List.of())
+                    .build();
+        }
+
+        List<User> users = userRepository.findAllById(userIds);
+
+        if (users.size() != userIds.size()) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "One or more user IDs are invalid.");
+        }
+
+        List<User> updatedUsers = userRepository.saveAll(users.stream().peek(user -> user.setActive(true)).toList());
+
+        return ListResponseDTO.<UserDTO>builder()
+                .total((long) updatedUsers.size())
+                .records(updatedUsers.stream().map(UserMapper::toDto).toList())
+                .build();
+    }
+
+    @Override
+    public List<Long> getUserIdsByRoleId(Long roleId, String userEmail) {
+        log.info("Getting user IDs for role ID: {}", roleId);
+
+        getUserByEmailInternal(userEmail);
+
+        if (roleId == null) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "Role ID is required");
+        }
+
+        return userRepository.findActiveUserIdsByRoleId(roleId);
     }
 
 }

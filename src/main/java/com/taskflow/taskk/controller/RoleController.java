@@ -76,4 +76,18 @@ public class RoleController {
                         .build()
         );
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<BaseApiResponse<String>> deleteRole(@RequestHeader(HEADER_USERID) String userEmail, @PathVariable Long id){
+
+        String response = roleService.deleteRole(userEmail, id);
+
+        return ResponseEntity.ok(
+                BaseApiResponse.<String>builder()
+                        .status(HttpStatus.OK.value())
+                        .message("Role deleted successfully")
+                        .data(response)
+                        .build()
+        );
+    }
 }
