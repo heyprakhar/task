@@ -109,4 +109,21 @@ public class RoleServiceImpl implements RoleService {
 
         return RoleMapper.toDto(savedRole);
     }
+
+    @Transactional
+    @Override
+    public String deleteRole(String userEmail, Long roleId) {
+
+        log.info("Deleting role with id: {}", roleId);
+
+        userService.getUserByEmailInternal(userEmail);
+
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND, "Role not found."));
+
+        userService.deactivateUsersByUserIds(userService.getUserIdsByRoleId(roleId, userEmail),userEmail);
+        roleRepository.delete(role);
+
+        return "Role with id: " + roleId + " has been deleted.";
+    }
 }
