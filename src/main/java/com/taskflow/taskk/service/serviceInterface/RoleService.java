@@ -3,6 +3,7 @@ package com.taskflow.taskk.service.serviceInterface;
 import com.taskflow.taskk.dto.RoleDTO;
 import com.taskflow.taskk.dto.responseDto.ListResponseDTO;
 import com.taskflow.taskk.request.ParamRequest;
+import jakarta.transaction.Transactional;
 
 public interface RoleService {
     ListResponseDTO<RoleDTO> getAllRoles(String userEmail, ParamRequest request);
@@ -13,5 +14,8 @@ public interface RoleService {
 
     RoleDTO updateRole(String userEmail, Long roleId, RoleDTO roleDTO);
 
-    String deleteRole(String userEmail, Long roleId);
+    RoleDTO deactivateRole(String userEmail,Long roleId);
+
+    @Transactional
+    RoleDTO activateRole(String userEmail, Long roleId, ParamRequest request);
 }
