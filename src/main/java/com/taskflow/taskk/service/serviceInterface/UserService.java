@@ -21,5 +21,5 @@ public interface UserService {
 
     ListResponseDTO<UserDTO> activateUsersByUserIds(List<Long> userIds, String userEmail);
 
-    List<Long> getUserIdsByRoleId(Long roleId, String userEmail);
+    List<Long> getUserIdsByRoleId(Long roleId);
 }

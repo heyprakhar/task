@@ -22,6 +22,7 @@ public class ParamRequest extends ListingRequestDto{
     private Boolean active;
     private Long userRoleId;
     private String search;
+    private boolean activateUser;
 
     public boolean isRecords() { return Boolean.TRUE.equals(records); }
 

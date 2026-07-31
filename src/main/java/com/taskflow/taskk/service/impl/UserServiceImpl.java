@@ -184,16 +184,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<Long> getUserIdsByRoleId(Long roleId, String userEmail) {
+    public List<Long> getUserIdsByRoleId(Long roleId) {
         log.info("Getting user IDs for role ID: {}", roleId);
-
-        getUserByEmailInternal(userEmail);
 
         if (roleId == null) {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "Role ID is required");
         }
 
-        return userRepository.findActiveUserIdsByRoleId(roleId);
+        return userRepository.findAllUserIdsByRoleId(roleId);
     }
 
 }

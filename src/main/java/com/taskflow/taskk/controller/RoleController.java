@@ -6,6 +6,7 @@ import com.taskflow.taskk.dto.RoleDTO;
 import com.taskflow.taskk.dto.responseDto.ListResponseDTO;
 import com.taskflow.taskk.request.ParamRequest;
 import com.taskflow.taskk.service.serviceInterface.RoleService;
+import com.taskflow.taskk.service.serviceInterface.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import static com.taskflow.taskk.common.utils.Constants.HEADER_USERID;
 public class RoleController {
 
     private final RoleService roleService;
+    private final UserService userService;
 
     @GetMapping
     public ResponseEntity<BaseApiResponse<ListResponseDTO<RoleDTO>>> getAllRoles(@RequestHeader(HEADER_USERID) String userEmail, ParamRequest request){
@@ -77,15 +79,29 @@ public class RoleController {
         );
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<BaseApiResponse<String>> deleteRole(@RequestHeader(HEADER_USERID) String userEmail, @PathVariable Long id){
+    @PatchMapping("/{id}/deactivate")
+    public ResponseEntity<BaseApiResponse<RoleDTO>> deactivateRole(@RequestHeader(HEADER_USERID) String userEmail,@PathVariable Long id){
 
-        String response = roleService.deleteRole(userEmail, id);
+        RoleDTO response = roleService.deactivateRole(userEmail, id);
 
         return ResponseEntity.ok(
-                BaseApiResponse.<String>builder()
+                BaseApiResponse.<RoleDTO>builder()
                         .status(HttpStatus.OK.value())
-                        .message("Role deleted successfully")
+                        .message("Role deactivated successfully")
+                        .data(response)
+                        .build()
+        );
+    }
+
+    @PatchMapping("/{id}/activate")
+    public ResponseEntity<BaseApiResponse<RoleDTO>> activateRole(@RequestHeader(HEADER_USERID) String userEmail,@PathVariable Long id, ParamRequest request){
+
+        RoleDTO response = roleService.activateRole(userEmail, id, request);
+
+        return ResponseEntity.ok(
+                BaseApiResponse.<RoleDTO>builder()
+                        .status(HttpStatus.OK.value())
+                        .message("Role activated successfully")
                         .data(response)
                         .build()
         );
