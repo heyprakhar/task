@@ -22,8 +22,7 @@ import java.util.Optional;
     @Query("""
     SELECT u.id
     FROM User u
-    WHERE u.active = true
-      AND u.roleId = :roleId
+    WHERE u.roleId = :roleId
 """)
-    List<Long> findActiveUserIdsByRoleId(@Param("roleId") Long roleId);
+    List<Long> findAllUserIdsByRoleId(Long roleId);
 }
