@@ -20,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -112,18 +113,57 @@ public class RoleServiceImpl implements RoleService {
 
     @Transactional
     @Override
-    public String deleteRole(String userEmail, Long roleId) {
+    public RoleDTO deactivateRole(String userEmail, Long roleId) {
 
-        log.info("Deleting role with id: {}", roleId);
+        log.info("Deactivating role with id: {}", roleId);
 
-        userService.getUserByEmailInternal(userEmail);
+        UserDTO user =  userService.getUserByEmailInternal(userEmail);
 
         Role role = roleRepository.findById(roleId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND, "Role not found."));
 
-        userService.deactivateUsersByUserIds(userService.getUserIdsByRoleId(roleId, userEmail),userEmail);
-        roleRepository.delete(role);
+        if (!role.isActive()) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "Role with id '" + roleId + "' already in-active.");
+        }
 
-        return "Role with id: " + roleId + " has been deleted.";
+        List<Long> userIds = userService.getUserIdsByRoleId(roleId);
+
+
+        role.setActive(false);
+        role.setDeactivatedBy(user.getId());
+        role.setReactivatedTime(null);
+        role.setActivatedBy(null);
+        role.setDeactivatedTime(LocalDateTime.now());
+        Role savedRole =  roleRepository.save(role);
+        userService.deactivateUsersByUserIds(userIds,userEmail);
+
+        return RoleMapper.toDto(savedRole);
+    }
+
+    @Transactional
+    @Override
+    public RoleDTO activateRole(String userEmail, Long roleId, ParamRequest request) {
+        log.info("Activating role with id: {}", roleId);
+       UserDTO user = userService.getUserByEmailInternal(userEmail);
+
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND, "Role not found."));
+
+        if (role.isActive()) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "Role with id '" + roleId + "' already active.");
+        }
+
+        List<Long> userIds = userService.getUserIdsByRoleId(roleId);
+
+        role.setActive(true);
+        role.setActivatedBy(user.getId());
+        role.setReactivatedTime(LocalDateTime.now());
+        role.setDeactivatedTime(null);
+        role.setDeactivatedBy(null);
+        Role savedRole = roleRepository.save(role);
+        if (request.isActivateUser()){
+            userService.activateUsersByUserIds(userIds,userEmail);
+        }
+        return RoleMapper.toDto(savedRole);
     }
 }

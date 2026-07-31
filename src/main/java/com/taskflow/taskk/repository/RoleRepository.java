@@ -17,7 +17,8 @@ public interface RoleRepository extends JpaRepository<Role, Long>, JpaSpecificat
 
     List<Role> findByActive(Boolean active);
 
-    Optional<Role> findByIdAndActive(Long id, Boolean active);
+    Optional<Role> findByIdAndActiveTrue(Long id);
 
     List<Role> findByNameContainingIgnoreCase(String name);
+
 }

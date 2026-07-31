@@ -25,6 +25,14 @@ public class RoleDTO {
 
     private Long updatedBy;
 
+    private Long deactivatedBy;
+
+    private Long activatedBy;
+
+    private LocalDateTime reactivatedTime;
+
+    private LocalDateTime deactivatedTime;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
