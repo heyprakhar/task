@@ -1,12 +1,12 @@
 package com.taskflow.taskk.controller;
 
 
+import com.taskflow.taskk.annotation.ApiResponseMessage;
 import com.taskflow.taskk.common.response.BaseApiResponse;
 import com.taskflow.taskk.dto.RoleDTO;
 import com.taskflow.taskk.dto.responseDto.ListResponseDTO;
 import com.taskflow.taskk.request.ParamRequest;
 import com.taskflow.taskk.service.serviceInterface.RoleService;
-import com.taskflow.taskk.service.serviceInterface.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,6 @@ import static com.taskflow.taskk.common.utils.Constants.HEADER_USERID;
 public class RoleController {
 
     private final RoleService roleService;
-    private final UserService userService;
 
     @GetMapping
     public ResponseEntity<BaseApiResponse<ListResponseDTO<RoleDTO>>> getAllRoles(@RequestHeader(HEADER_USERID) String userEmail, ParamRequest request){
