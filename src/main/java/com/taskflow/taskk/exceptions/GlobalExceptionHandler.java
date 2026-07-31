@@ -1,7 +1,10 @@
 package com.taskflow.taskk.exceptions;
 
+import com.taskflow.taskk.annotation.ApiResponseMessage;
 import com.taskflow.taskk.common.response.BaseApiResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,11 +17,14 @@ import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -157,21 +163,40 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public BaseApiResponse<Void> handleException(Exception ex) {
+    public BaseApiResponse<Void> handleException(Exception ex, HttpServletRequest request) {
 
-        ex.printStackTrace();
+        log.error("Unhandled exception", ex);
+
+        String message = getErrorMessage(request);
 
         return buildResponse(
                 ErrorCode.INTERNAL_SERVER_ERROR,
-                ex.getMessage()
+                message
         );
+    }
+
+    private String getErrorMessage(HttpServletRequest request) {
+
+        Object handler = request.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE);
+
+        if (handler instanceof HandlerMethod handlerMethod) {
+            ApiResponseMessage annotation = handlerMethod.getMethodAnnotation(ApiResponseMessage.class);
+
+            if (annotation != null && !annotation.error().isBlank()) {
+                return annotation.error();
+            }
+        }
+
+        return ErrorCode.INTERNAL_SERVER_ERROR.getDefaultMessage();
     }
 
     private BaseApiResponse<Void> buildResponse(ErrorCode errorCode, String reason) {
 
         return BaseApiResponse.<Void>builder()
                 .status(errorCode.getHttpStatus().value())
-                .message(errorCode.getDefaultMessage())
+                .message(reason != null && !reason.isBlank()
+                        ? reason
+                        : errorCode.getDefaultMessage())
                 .data(null)
                 .build();
     }
