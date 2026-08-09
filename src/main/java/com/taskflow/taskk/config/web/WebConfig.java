@@ -1,4 +1,4 @@
-package com.taskflow.taskk.config;
+package com.taskflow.taskk.config.web;
 
 import com.taskflow.taskk.interceptor.RequestLoggingInterceptor;
 import org.springframework.context.annotation.Configuration;
