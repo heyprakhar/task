@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="x-apple-disable-message-reformatting">
+  <title>Welcome to TaskFlow</title>
+</head>
+
+<body style="margin: 0; padding: 0; background-color: #f4f6f8; font-family: Arial, Helvetica, sans-serif; color: #1f2937;">
+
+<table width="100%" cellpadding="0" cellspacing="0" border="0"
+       style="width: 100%; background-color: #f4f6f8;">
+
+  <tr>
+    <td align="center" style="padding: 40px 16px;">
+
+      <!-- Main Email Card -->
+      <table width="100%" cellpadding="0" cellspacing="0" border="0"
+             style="width: 100%; max-width: 600px; background-color: #ffffff; border-radius: 12px; overflow: hidden;">
+
+        <!-- Header -->
+        <tr>
+          <td align="center"
+              style="background-color: #2563eb; padding: 32px 20px;">
+
+            <h1 style="margin: 0; color: #ffffff; font-size: 28px; line-height: 36px; font-weight: 700;">
+              TaskFlow
+            </h1>
+
+            <p style="margin: 8px 0 0; color: #dbeafe; font-size: 14px; line-height: 20px;">
+              Manage your tasks. Stay organized.
+            </p>
+
+          </td>
+        </tr>
+
+        <!-- Content -->
+        <tr>
+          <td style="padding: 40px 40px 30px;">
+
+            <h2 style="margin: 0 0 20px; font-size: 24px; line-height: 32px; color: #111827;">
+              Welcome,
+              <span th:text="${username}" style="color: #2563eb;">
+                User
+              </span>
+              👋
+            </h2>
+
+            <p style="margin: 0 0 16px; font-size: 16px; line-height: 26px; color: #4b5563;">
+              Your TaskFlow account has been successfully created.
+            </p>
+
+            <p style="margin: 0 0 28px; font-size: 16px; line-height: 26px; color: #4b5563;">
+              You can now log in to TaskFlow and start managing your tasks,
+              organizing them, and staying productive.
+            </p>
+
+          </td>
+        </tr>
+
+        <!-- Divider -->
+        <tr>
+          <td style="padding: 0 40px;">
+            <div style="height: 1px; background-color: #e5e7eb;"></div>
+          </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+          <td align="center"
+              style="padding: 25px 40px 30px;">
+
+            <p style="margin: 0 0 8px; font-size: 14px; line-height: 20px; color: #6b7280;">
+              Regards,
+            </p>
+
+            <p style="margin: 0 0 16px; font-size: 14px; line-height: 20px; font-weight: 600; color: #374151;">
+              TaskFlow Team
+            </p>
+
+            <p style="margin: 0; font-size: 12px; line-height: 18px; color: #9ca3af;">
+              This is an automated email from TaskFlow.
+              Please do not reply to this email.
+            </p>
+
+          </td>
+        </tr>
+
+      </table>
+
+      <!-- Copyright -->
+      <table width="100%" cellpadding="0" cellspacing="0" border="0"
+             style="width: 100%; max-width: 600px;">
+
+        <tr>
+          <td align="center" style="padding: 20px 10px 0;">
+
+            <p style="margin: 0; font-size: 12px; line-height: 18px; color: #9ca3af;">
+              © 2026 TaskFlow. All rights reserved.
+            </p>
+
+          </td>
+        </tr>
+
+      </table>
+
+    </td>
+  </tr>
+
+</table>
+
+</body>
+
+</html>
