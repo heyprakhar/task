@@ -1,4 +1,4 @@
-package com.taskflow.taskk.config;
+package com.taskflow.taskk.config.swagger;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;

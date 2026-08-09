@@ -1,13 +1,16 @@
 package com.taskflow.taskk.service.impl;
 
 import com.taskflow.taskk.dto.UserDTO;
+import com.taskflow.taskk.dto.email.EmailTemplateRequest;
 import com.taskflow.taskk.dto.responseDto.ListResponseDTO;
 import com.taskflow.taskk.entity.User;
+import com.taskflow.taskk.enums.EmailTemplate;
 import com.taskflow.taskk.exceptions.BusinessException;
 import com.taskflow.taskk.exceptions.ErrorCode;
 import com.taskflow.taskk.mapper.UserMapper;
 import com.taskflow.taskk.repository.UserRepository;
 import com.taskflow.taskk.request.ParamRequest;
+import com.taskflow.taskk.service.serviceInterface.EmailService;
 import com.taskflow.taskk.service.serviceInterface.UserService;
 import com.taskflow.taskk.specification.UserSpecification;
 import com.taskflow.taskk.utils.CommonUtils;
@@ -21,6 +24,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.ObjectUtils;
 
 import java.util.List;
+import java.util.Map;
+
+import static com.taskflow.taskk.common.utils.Constants.*;
 
 @Slf4j
 @Service
@@ -29,6 +35,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     @Override
     public UserDTO createUser(String userEmail, UserDTO userDTO) {
@@ -44,6 +51,7 @@ public class UserServiceImpl implements UserService {
         newUser.setCreatedBy(loggedInUser.getId());
         newUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         User savedUser = userRepository.save(newUser);
+        sendUserCreatedEmail(savedUser);
         return UserMapper.toDto(savedUser);
     }
 
@@ -112,6 +120,7 @@ public class UserServiceImpl implements UserService {
 
         UserMapper.updateEntity(userDTO, user);
         User updatedUser = userRepository.save(user);
+        sendUserUpdatedEmail(updatedUser);
 
         return UserMapper.toDto(updatedUser);
     }
@@ -147,7 +156,9 @@ public class UserServiceImpl implements UserService {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "One or more user IDs are invalid.");
         }
 
-        List<User> updatedUsers = userRepository.saveAll(users.stream().peek(user -> user.setActive(false)).toList());
+        users.forEach(user -> user.setActive(false));
+        List<User> updatedUsers = userRepository.saveAll(users);
+        updatedUsers.forEach(this::sendUserDeactivatedEmail);
 
         return ListResponseDTO.<UserDTO>builder()
                 .total((long) updatedUsers.size())
@@ -175,7 +186,9 @@ public class UserServiceImpl implements UserService {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "One or more user IDs are invalid.");
         }
 
-        List<User> updatedUsers = userRepository.saveAll(users.stream().peek(user -> user.setActive(true)).toList());
+        users.forEach(user -> user.setActive(true));
+        List<User> updatedUsers = userRepository.saveAll(users);
+        updatedUsers.forEach(this::sendUserActivatedEmail);
 
         return ListResponseDTO.<UserDTO>builder()
                 .total((long) updatedUsers.size())
@@ -192,6 +205,50 @@ public class UserServiceImpl implements UserService {
         }
 
         return userRepository.findAllUserIdsByRoleId(roleId);
+    }
+
+    public void sendUserCreatedEmail(User savedUser) {
+        emailService.sendTemplate(
+                EmailTemplateRequest.builder()
+                        .to(List.of(savedUser.getEmail()))
+                        .subject(WELCOME_MESSAGE)
+                        .template(EmailTemplate.WELCOME)
+                        .variables(Map.of(USERNAME_LOWER, savedUser.getName()))
+                        .build()
+        );
+    }
+
+    public void sendUserUpdatedEmail(User updatedUser) {
+        emailService.sendTemplate(
+                EmailTemplateRequest.builder()
+                        .to(List.of(updatedUser.getEmail()))
+                        .subject(USER_UPDATED_MESSAGE)
+                        .template(EmailTemplate.USER_UPDATED)
+                        .variables(Map.of(USERNAME_LOWER, updatedUser.getName()))
+                        .build()
+        );
+    }
+
+    public void sendUserActivatedEmail(User user) {
+        emailService.sendTemplate(
+                EmailTemplateRequest.builder()
+                        .to(List.of(user.getEmail()))
+                        .subject(USER_ACTIVATED_MESSAGE)
+                        .template(EmailTemplate.USER_ACTIVATED)
+                        .variables(Map.of(USERNAME_LOWER, user.getName()))
+                        .build()
+        );
+    }
+
+    public void sendUserDeactivatedEmail(User user) {
+        emailService.sendTemplate(
+                EmailTemplateRequest.builder()
+                        .to(List.of(user.getEmail()))
+                        .subject(USER_DEACTIVATED_MESSAGE)
+                        .template(EmailTemplate.USER_DEACTIVATED)
+                        .variables(Map.of(USERNAME_LOWER, user.getName()))
+                        .build()
+        );
     }
 
 }
