@@ -11,7 +11,7 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 public class Task_Management_Service {
 
 	public static void main(String[] args) {
-        log.info("Application started successfully");
+        log.info("Application started successfully without spring security");
 		SpringApplication.run(Task_Management_Service.class, args);
 	}
 
