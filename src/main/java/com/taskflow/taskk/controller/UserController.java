@@ -1,102 +1,106 @@
 package com.taskflow.taskk.controller;
 
-
-// import statements - 
-import org.springframework.web.bind.annotation.RestController;
-import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpStatus;
-import com.taskflow.taskk.dto.requestDto.UserRequestDto;
-import com.taskflow.taskk.dto.responseDto.UserResponseDto;
-import com.taskflow.taskk.service.serviceInterface.UserService;
 import com.taskflow.taskk.common.response.BaseApiResponse;
-import org.springframework.web.bind.annotation.GetMapping;
-import java.util.List;
-import java.util.UUID;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import com.taskflow.taskk.dto.UserDTO;
+import com.taskflow.taskk.dto.UserIdsRequest;
+import com.taskflow.taskk.dto.responseDto.ListResponseDTO;
+import com.taskflow.taskk.request.ParamRequest;
+import com.taskflow.taskk.service.serviceInterface.UserService;
+import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+
+import static com.taskflow.taskk.common.utils.Constants.HEADER_USERID;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/users")
+@RequestMapping("/user")
 public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("/create-user")
-    public ResponseEntity<BaseApiResponse<UserResponseDto>> createUser(
-            @RequestBody UserRequestDto userRequestDto) {
+    @PostMapping
+    public ResponseEntity<BaseApiResponse<UserDTO>> createUser(@RequestHeader(HEADER_USERID) String userEmail, @RequestBody UserDTO userDTO){
 
-        UserResponseDto userResponseDto = userService.createUser(userRequestDto);
+        UserDTO response = userService.createUser(userEmail, userDTO);
 
-        BaseApiResponse<UserResponseDto> response = new BaseApiResponse<>(true, "User created successfully",
-                userResponseDto);
-
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(BaseApiResponse.<UserDTO>builder()
+                        .status(HttpStatus.CREATED.value())
+                        .message("User created successfully")
+                        .data(response)
+                        .build()
+                );
     }
 
-    // fetch all user endpoint-
-@GetMapping("/fetch-all-users")
-    public ResponseEntity<BaseApiResponse<List<UserResponseDto>>> getAllUsers() {
-        List<UserResponseDto> users = userService.fetchAllUsers();
-        BaseApiResponse<List<UserResponseDto>> response = new BaseApiResponse<>(true, "Users fetched successfully", users);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+    @GetMapping
+    public ResponseEntity<BaseApiResponse<ListResponseDTO<UserDTO>>> getAllUsers(@RequestHeader(HEADER_USERID) String userEmail, ParamRequest request){
+
+        ListResponseDTO<UserDTO> response = userService.getAllUsers(userEmail, request);
+
+        return ResponseEntity.ok(BaseApiResponse.<ListResponseDTO<UserDTO>>builder()
+                .status(HttpStatus.OK.value())
+                .message("Users fetched successfully")
+                .data(response)
+                .build()
+        );
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<BaseApiResponse<UserDTO>> getUserById(@RequestHeader(HEADER_USERID) String userEmail,@PathVariable Long id){
 
-    //fetch user by Id endpoint-
-    @GetMapping("/fetch-user/{id}")
-    public ResponseEntity<BaseApiResponse<UserResponseDto>> getUserById(@PathVariable UUID id) {
-        UserResponseDto userResponseDto = userService.fetchUserById(id);
-        BaseApiResponse<UserResponseDto> response = new BaseApiResponse<>(true, "User fetched successfully",
-                userResponseDto);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        UserDTO response = userService.getUserById(userEmail, id);
+
+        return ResponseEntity.ok(
+                BaseApiResponse.<UserDTO>builder()
+                        .status(HttpStatus.OK.value())
+                        .message("User fetched successfully")
+                        .data(response)
+                        .build()
+        );
     }
 
-    //update user details endpoint-
-    @PatchMapping("/update-user/{id}")
-     public ResponseEntity<BaseApiResponse<UserResponseDto>> updateUserById(@PathVariable UUID id, @RequestBody UserRequestDto userRequestDto) {
-        UserResponseDto updatedUser = userService.updateUserById(id, userRequestDto);
-        BaseApiResponse<UserResponseDto> response = new BaseApiResponse<>(true, "User updated successfully",
-                updatedUser);
-        return new ResponseEntity<>(response, HttpStatus.OK);
-     }
+    @PutMapping("/{id}")
+    public ResponseEntity<BaseApiResponse<UserDTO>> updateUser(@RequestHeader(HEADER_USERID) String userEmail, @PathVariable Long id, @RequestBody UserDTO userDTO) {
 
-     // delete user by Id endpoint- 
-    @DeleteMapping("/delete-user/{id}")
-    public ResponseEntity<BaseApiResponse<Void>> deleteUserById(@PathVariable UUID id) {
-        userService.deleteUserById(id);
-        BaseApiResponse<Void> response = new BaseApiResponse<>(true, "User deleted successfully", null);
-        return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
-    }
-    
-    // activate user account endpoint-
-    @PatchMapping("/{id}/activate")
-    public ResponseEntity<BaseApiResponse<Void>> activateUserAccount(@PathVariable UUID id) {
-        userService.activateUserAccount(id);
-        BaseApiResponse<Void> response = new BaseApiResponse<>(true, "User account activated successfully", null);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        UserDTO response = userService.updateUser(userEmail, userDTO, id);
+
+        return ResponseEntity.ok(
+                BaseApiResponse.<UserDTO>builder()
+                        .status(HttpStatus.OK.value())
+                        .message("User updated successfully")
+                        .data(response)
+                        .build()
+        );
     }
 
-    // deactivate user account endpoint-
-    @PatchMapping("/{id}/deactivate")
-    public ResponseEntity<BaseApiResponse<Void>> deactivateUserAccount(@PathVariable UUID id) {
-        userService.deactivateUserAccount(id);
-        BaseApiResponse<Void> response = new BaseApiResponse<>(true, "User account deactivated successfully", null);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+    @PatchMapping("/deactivate")
+    public ResponseEntity<BaseApiResponse<ListResponseDTO<UserDTO>>> deactivateUsers(@RequestBody UserIdsRequest request, @RequestHeader(HEADER_USERID) String userEmail) {
+
+        ListResponseDTO<UserDTO> response = userService.deactivateUsersByUserIds(request.getUserIds(), userEmail);
+
+        return ResponseEntity.ok(
+                BaseApiResponse.<ListResponseDTO<UserDTO>>builder()
+                        .status(HttpStatus.OK.value())
+                        .message("Users deactivated successfully")
+                        .data(response)
+                        .build()
+        );
     }
 
-    // fetch user by email endpoint-
-    @GetMapping("/email/{email}")
-    public ResponseEntity<BaseApiResponse<UserResponseDto>> getUserByEmail(@PathVariable String email) {
-        UserResponseDto userResponseDto = userService.fetchUserByEmail(email);
-        BaseApiResponse<UserResponseDto> response = new BaseApiResponse<>(true, "User fetched successfully",
-                userResponseDto);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+    @PatchMapping("/activate")
+    public ResponseEntity<BaseApiResponse<ListResponseDTO<UserDTO>>> activateUsers(@RequestBody UserIdsRequest request, @RequestHeader(HEADER_USERID) String userEmail) {
+
+        ListResponseDTO<UserDTO> response = userService.activateUsersByUserIds(request.getUserIds(), userEmail);
+
+        return ResponseEntity.ok(
+                BaseApiResponse.<ListResponseDTO<UserDTO>>builder()
+                        .status(HttpStatus.OK.value())
+                        .message("Users activated successfully")
+                        .data(response)
+                        .build()
+        );
     }
-    
 }

@@ -1,10 +1,5 @@
-package com.taskflow.taskk.entity;
+package com.taskflow.taskk.dto;
 
-
-import com.taskflow.taskk.common.entity.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,23 +7,23 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@Entity
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "roles")
-public class Role extends BaseEntity {
+public class RoleDTO {
 
-    @Column(nullable = false, unique = true)
+    private Long id;
+
     private String name;
 
     private String description;
 
-    @Builder.Default
-    private boolean active = true;
+    private Boolean active;
 
     private Long createdBy;
+
+    private Long updatedBy;
 
     private Long deactivatedBy;
 
@@ -38,6 +33,7 @@ public class Role extends BaseEntity {
 
     private LocalDateTime deactivatedTime;
 
-    private Long updatedBy;
+    private LocalDateTime createdAt;
 
+    private LocalDateTime updatedAt;
 }
