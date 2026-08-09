@@ -15,4 +15,6 @@ public class Constants {
     public static final String USER_ACTIVATED_MESSAGE = "Your TaskFlow account has been activated";
     public static final String USER_DEACTIVATED_MESSAGE = "Your TaskFlow account has been deactivated";
     public static final String USER_ROLE = "userRole";
+    public static final String EMAIL_TEMPLATE_PREFIX = "email/";
+
 }
