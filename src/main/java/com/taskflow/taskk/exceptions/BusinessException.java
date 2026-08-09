@@ -4,10 +4,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.http.HttpStatus;
 
+import java.io.Serial;
+
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class BusinessException extends RuntimeException {
 
+    @Serial
     private static final long serialVersionUID = 2457189159617736175L;
 
     private HttpStatus status;
