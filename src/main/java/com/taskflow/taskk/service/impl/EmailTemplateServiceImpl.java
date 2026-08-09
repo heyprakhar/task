@@ -11,11 +11,12 @@ import org.thymeleaf.context.Context;
 import java.util.Collections;
 import java.util.Map;
 
+import static com.taskflow.taskk.common.utils.Constants.EMAIL_TEMPLATE_PREFIX;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class EmailTemplateServiceImpl implements EmailTemplateService {
-    private static final String EMAIL_TEMPLATE_PREFIX = "email/";
 
     private final TemplateEngine templateEngine;
 
