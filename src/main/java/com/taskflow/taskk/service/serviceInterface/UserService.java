@@ -1,27 +1,25 @@
 package com.taskflow.taskk.service.serviceInterface;
 
+import com.taskflow.taskk.dto.UserDTO;
+import com.taskflow.taskk.dto.responseDto.ListResponseDTO;
+import com.taskflow.taskk.request.ParamRequest;
 
 import java.util.List;
-import java.util.UUID;
-
-// import statements -
-import com.taskflow.taskk.dto.requestDto.UserRequestDto;
-import com.taskflow.taskk.dto.responseDto.UserResponseDto;
 
 public interface UserService {
-    UserResponseDto createUser(UserRequestDto userRequestDto);
+    UserDTO createUser(String userEmail, UserDTO userDTO);
 
-    List<UserResponseDto> fetchAllUsers();
-        
-    UserResponseDto fetchUserById(UUID id);
+    UserDTO getUserById(String userEmail, Long userId);
 
-    UserResponseDto updateUserById(UUID id, UserRequestDto userRequestDto);
+    ListResponseDTO<UserDTO> getAllUsers(String userEmail, ParamRequest request);
 
-    void deleteUserById(UUID id);
+    UserDTO updateUser(String userEmail, UserDTO userDTO, Long userId);
 
-    void activateUserAccount(UUID id);
+    UserDTO getUserByEmailInternal(String userEmail);
 
-    void deactivateUserAccount(UUID id);
+    ListResponseDTO<UserDTO> deactivateUsersByUserIds(List<Long> userIds,String userEmail);
 
-    UserResponseDto fetchUserByEmail(String email);
+    ListResponseDTO<UserDTO> activateUsersByUserIds(List<Long> userIds, String userEmail);
+
+    List<Long> getUserIdsByRoleId(Long roleId);
 }

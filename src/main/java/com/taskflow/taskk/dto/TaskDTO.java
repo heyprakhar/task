@@ -1,16 +1,18 @@
-package com.taskflow.taskk.dto.responseDto;
+package com.taskflow.taskk.dto;
 
-import lombok.Data;
+import com.taskflow.taskk.entity.User;
 import com.taskflow.taskk.enums.TaskPriority;
 import com.taskflow.taskk.enums.TaskStatus;
+import lombok.Builder;
+import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Data
-public class TaskResponseDto {
+@Builder
+public class TaskDTO {
 
-    private UUID id;
+    private Long id;
 
     private String title;
 
@@ -20,11 +22,13 @@ public class TaskResponseDto {
 
     private TaskPriority priority;
 
-    private UUID assignedTo;
+    private Long assignedTo;
 
     private LocalDateTime dueDate;
 
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
+
+    private Long createdBy;
 }

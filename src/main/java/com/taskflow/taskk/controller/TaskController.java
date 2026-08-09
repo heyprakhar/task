@@ -1,109 +1,103 @@
 package com.taskflow.taskk.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import com.taskflow.taskk.dto.requestDto.TaskRequestDto;
-import com.taskflow.taskk.dto.responseDto.TaskResponseDto;
-import com.taskflow.taskk.enums.TaskPriority;
-import com.taskflow.taskk.enums.TaskStatus;
+import com.taskflow.taskk.common.response.BaseApiResponse;
+import com.taskflow.taskk.dto.TaskDTO;
+import com.taskflow.taskk.dto.responseDto.ListResponseDTO;
+import com.taskflow.taskk.request.ParamRequest;
 import com.taskflow.taskk.service.serviceInterface.TaskService;
 import lombok.AllArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import com.taskflow.taskk.common.response.BaseApiResponse;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import java.util.UUID;
-import org.springframework.web.bind.annotation.PatchMapping;
-import com.taskflow.taskk.dto.requestDto.TaskStatusUpdateRequestDto;
-import org.springframework.web.bind.annotation.GetMapping;
-import java.util.List;
-import org.springframework.web.bind.annotation.DeleteMapping;   
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import static com.taskflow.taskk.common.utils.Constants.HEADER_USERID;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/tasks")
+@RequestMapping("/tasks")
 public class TaskController {
 
     private final TaskService taskService;
 
+    @GetMapping
+    public ResponseEntity<BaseApiResponse<ListResponseDTO<TaskDTO>>> getTasks(@RequestHeader(HEADER_USERID) String userEmail, ParamRequest request) {
 
-    // endpoints for task management - 
+        ListResponseDTO<TaskDTO> response = taskService.getAllTasks(userEmail, request);
 
-    // create task - POST /tasks 
-    @PostMapping("/create-task")
-    public ResponseEntity<BaseApiResponse<TaskResponseDto>> createTask(@RequestBody TaskRequestDto taskRequestDto) {
-        TaskResponseDto taskResponseDto = taskService.createTask(taskRequestDto);
-        BaseApiResponse<TaskResponseDto> response = new BaseApiResponse<>(true, "Task created successfully",
-                taskResponseDto);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
-    }
-    
-    // assign task to a user -
-    @PutMapping("/{taskId}/assign/{userId}")
-    public ResponseEntity<BaseApiResponse<TaskResponseDto>> assignTaskToUser(@PathVariable UUID taskId, @PathVariable UUID userId) {
-        TaskResponseDto taskResponseDto = taskService.assignTaskToUser(taskId, userId);
-        BaseApiResponse<TaskResponseDto> response = new BaseApiResponse<>(true, "Task assigned successfully", taskResponseDto);
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-    
-    // update task status endpoint -
-    @PatchMapping("/{taskId}/update-status")
-    public ResponseEntity<BaseApiResponse<TaskResponseDto>> updateTask(@PathVariable UUID taskId,
-            @RequestBody TaskStatusUpdateRequestDto taskStatusUpdateRequestDto) {
-        TaskResponseDto taskResponseDto = taskService.updateTaskStatus(taskId, taskStatusUpdateRequestDto);
-        BaseApiResponse<TaskResponseDto> response = new BaseApiResponse<>(true, "Task status updated successfully", taskResponseDto);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(
+                BaseApiResponse.<ListResponseDTO<TaskDTO>>builder()
+                        .status(HttpStatus.OK.value())
+                        .message("Tasks fetched successfully")
+                        .data(response)
+                        .build()
+        );
     }
 
-// fetch all tasks or filter by status/priority
-@GetMapping("/fetch-tasks")
-public ResponseEntity<BaseApiResponse<List<TaskResponseDto>>> fetchTasks(
-        @RequestParam(required = false) TaskStatus status,
-        @RequestParam(required = false) TaskPriority priority) {
+    @GetMapping("/test")
+    public ResponseEntity<BaseApiResponse<ListResponseDTO<TaskDTO>>> getTasks(ParamRequest request) {
 
-    List<TaskResponseDto> tasks = taskService.filterTaskByStatusAndPriority(status, priority);
+        ListResponseDTO<TaskDTO> response = taskService.getAllTasks(request);
 
-    BaseApiResponse<List<TaskResponseDto>> response =
-            new BaseApiResponse<>(true, "Tasks fetched successfully", tasks);
-
-    return new ResponseEntity<>(response, HttpStatus.OK);
-}
-
-    // fetch tasks by user -
-    @GetMapping("/fetch-tasks/user/{userId}") 
-    public ResponseEntity<BaseApiResponse<List<TaskResponseDto>>> fetchTasksByUserId(@PathVariable UUID userId) {
-        List<TaskResponseDto> tasks = taskService.getTasksByUserId(userId);
-        BaseApiResponse<List<TaskResponseDto>> response = new BaseApiResponse<>(true, "Tasks fetched successfully for user with id: " + userId, tasks);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(
+                BaseApiResponse.<ListResponseDTO<TaskDTO>>builder()
+                        .status(HttpStatus.OK.value())
+                        .message("Tasks fetched successfully")
+                        .data(response)
+                        .build()
+        );
     }
 
-    // fetch task by taskId -
-    @GetMapping("/fetch-tasks/{taskId}")
-    public ResponseEntity<BaseApiResponse<TaskResponseDto>> fetchTaskById(@PathVariable UUID taskId) {
-        TaskResponseDto taskResponseDto = taskService.getTaskByID(taskId);
-        BaseApiResponse<TaskResponseDto> response = new BaseApiResponse<>(true, "Task fetched successfully with id: " + taskId, taskResponseDto);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+    @PostMapping
+    public ResponseEntity<BaseApiResponse<TaskDTO>> createTask(@RequestBody TaskDTO taskDTO, @RequestHeader(HEADER_USERID) String userEmail) {
+
+        TaskDTO response = taskService.createTask(taskDTO,userEmail );
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(
+                        BaseApiResponse.<TaskDTO>builder()
+                                .status(HttpStatus.CREATED.value())
+                                .message("Task created successfully")
+                                .data(response)
+                                .build()
+                );
     }
 
-    // delete task by id -
-    @DeleteMapping("/delete-task/{taskId}")
-    public ResponseEntity<BaseApiResponse<Void>> deleteTaskById(@PathVariable UUID taskId) {
-        taskService.deleteTaskById(taskId);
-        BaseApiResponse<Void> response = new BaseApiResponse<>(true, "Task deleted successfully with id: " + taskId, null);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+    @GetMapping({"/{id}"})
+    public ResponseEntity<BaseApiResponse<TaskDTO>> getTaskById(@RequestHeader(HEADER_USERID) String userEmail, @PathVariable Long id) {
+        TaskDTO response = taskService.getTaskById(id, userEmail);
+        return ResponseEntity.ok(
+                        BaseApiResponse.<TaskDTO>builder()
+                                .status(HttpStatus.OK.value())
+                                .message("Task fetched successfully")
+                                .data(response)
+                                .build()
+                );
     }
 
-    // update task details -
-    @PutMapping("/update-task/{taskId}")
-    public ResponseEntity<BaseApiResponse<TaskResponseDto>> updateTaskDetails(@PathVariable UUID taskId,
-            @RequestBody TaskRequestDto taskRequestDto) {
-        TaskResponseDto taskResponseDto = taskService.updateTaskDetails(taskId, taskRequestDto);
-        BaseApiResponse<TaskResponseDto> response = new BaseApiResponse<>(true,
-                "Task details updated successfully with id: " + taskId, taskResponseDto);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+    @PatchMapping("/{id}")
+    public ResponseEntity<BaseApiResponse<TaskDTO>> updateTask(@RequestHeader(HEADER_USERID) String userEmail, @RequestBody TaskDTO taskDTO, @PathVariable Long id) {
+
+        TaskDTO response = taskService.updateTask(userEmail, taskDTO, id);
+        return ResponseEntity.ok(
+                BaseApiResponse.<TaskDTO>builder()
+                        .status(HttpStatus.OK.value())
+                        .message("Task updated successfully")
+                        .data(response)
+                        .build()
+        );
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<BaseApiResponse<Void>> deleteTaskById(@RequestHeader(HEADER_USERID) String userEmail, @PathVariable Long id) {
+        taskService.deleteTaskById(id, userEmail);
+        return ResponseEntity.ok(
+                BaseApiResponse.<Void>builder()
+                        .status(HttpStatus.OK.value())
+                        .message("Task has been deleted successfully.")
+                        .data(null)
+                        .build()
+        );
+    }
+
+
 }

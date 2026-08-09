@@ -5,11 +5,19 @@ import com.taskflow.taskk.enums.TaskPriority;
 import com.taskflow.taskk.enums.TaskStatus;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Data
 @Table(name = "tasks")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Task extends BaseEntity {
 
     @Column(nullable = false)
@@ -26,7 +34,10 @@ public class Task extends BaseEntity {
     @Column(name = "priority")
     private TaskPriority priority;
 
-    @ManyToOne
-    @JoinColumn(name = "assigned_to")
-    private User assignedTo;
+    @Column(name = "assigned_to")
+    private Long assignedTo;
+
+    private Long createdBy;
+
+    private LocalDateTime dueDate;
 }

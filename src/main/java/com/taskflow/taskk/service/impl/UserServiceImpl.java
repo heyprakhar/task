@@ -1,138 +1,197 @@
 package com.taskflow.taskk.service.impl;
 
-import com.taskflow.taskk.dto.requestDto.UserRequestDto;
-import com.taskflow.taskk.dto.responseDto.UserResponseDto;
-import com.taskflow.taskk.entity.Role;
+import com.taskflow.taskk.dto.UserDTO;
+import com.taskflow.taskk.dto.responseDto.ListResponseDTO;
 import com.taskflow.taskk.entity.User;
+import com.taskflow.taskk.exceptions.BusinessException;
+import com.taskflow.taskk.exceptions.ErrorCode;
 import com.taskflow.taskk.mapper.UserMapper;
-import com.taskflow.taskk.repository.RoleRepository;
 import com.taskflow.taskk.repository.UserRepository;
+import com.taskflow.taskk.request.ParamRequest;
 import com.taskflow.taskk.service.serviceInterface.UserService;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.UUID;
-import static com.taskflow.taskk.commonUtils.Constants.*;
-
-import lombok.AllArgsConstructor;
+import com.taskflow.taskk.specification.UserSpecification;
+import com.taskflow.taskk.utils.CommonUtils;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.ObjectUtils;
 
-@Service
-@AllArgsConstructor
+import java.util.List;
+
 @Slf4j
+@Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
-
-    // Create a new user with the default role- 
     @Override
-    public UserResponseDto createUser(UserRequestDto requestDto) {
+    public UserDTO createUser(String userEmail, UserDTO userDTO) {
 
-        log.info("Creating user with email: {}", requestDto.getEmail());
+        log.info("creating user");
+        UserDTO loggedInUser = getUserByEmailInternal(userEmail);
 
-        if (userRepository.findByEmail(requestDto.getEmail()).isPresent()) {
-            log.warn("User creation failed. Email already exists: {}", requestDto.getEmail());
-            throw new RuntimeException("Email already exists");
+        if (userRepository.existsByEmail(userDTO.getEmail())) {
+            throw new BusinessException(ErrorCode.DUPLICATE_RESOURCE, "User already exists with this email");
         }
 
-        log.debug("Fetching default role: {}", ROLE_USER);
-
-        Role role = roleRepository.findByName(ROLE_USER)
-                .orElseThrow(() -> {
-                    log.error("Default role {} not found in database", ROLE_USER);
-                    return new RuntimeException("Role not found");
-                });
-
-        log.debug("Role found: {}", role.getName());
-
-        User user = new User();
-        user.setName(requestDto.getName());
-        user.setEmail(requestDto.getEmail());
-        user.setPassword(requestDto.getPassword());
-        user.setRole(role);
-
-        log.debug("Saving user: {}", user.getEmail());
-
-        User savedUser = userRepository.save(user);
-
-        log.info("User created successfully with ID: {}", savedUser.getId());
-
-        return UserMapper.toUserResponseDto(savedUser);
+        User newUser = UserMapper.toEntity(userDTO);
+        newUser.setCreatedBy(loggedInUser.getId());
+        newUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        User savedUser = userRepository.save(newUser);
+        return UserMapper.toDto(savedUser);
     }
 
-    //fetch all users -
     @Override
-    public List<UserResponseDto> fetchAllUsers() {
-            List<User> users = userRepository.findAll();
-            return users.stream()
-                    .map(UserMapper::toUserResponseDto)
-                    .collect(Collectors.toList());  
-    }
-    // fetch user by Id-
-    public UserResponseDto fetchUserById(UUID id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
-        return UserMapper.toUserResponseDto(user);
+    public UserDTO getUserById(String userEmail, Long userId) {
+        log.info("getting user by id");
+        getUserByEmailInternal(userEmail);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.BAD_REQUEST, "User with provided ID not found"));
+
+        return UserMapper.toDto(user);
     }
 
-        
-    
-    // update user details-
-        @Override
-        public UserResponseDto updateUserById(UUID id, UserRequestDto userRequestDto){
-            User user = userRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
-            user.setName(userRequestDto.getName());
-            user.setEmail(userRequestDto.getEmail());
-            user.setPassword(userRequestDto.getPassword());
-            User updatedUser = userRepository.save(user);
-            return UserMapper.toUserResponseDto(updatedUser);
+    @Override
+    public ListResponseDTO<UserDTO> getAllUsers(String userEmail, ParamRequest request) {
+        log.info("getting all users");
+
+        getUserByEmailInternal(userEmail);
+
+        List<UserDTO> userDTOS = List.of();
+
+        Specification<User> spec = Specification.allOf(
+                UserSpecification.hasActiveStatus(request.getActive()),
+                UserSpecification.hasRoleId(request.getUserRoleId()),
+                UserSpecification.search(request.getSearch())
+        );
+
+
+        if(request.isRecords()){
+            request.setSortBy(request.getSortBy() == null ? "name" : request.getSortBy());
+
+            Page<User> users = userRepository.findAll(spec, CommonUtils.buildPageRequest(request));
+
+            userDTOS = users.getContent()
+                    .stream()
+                    .map(UserMapper::toDto)
+                    .toList();
         }
 
-        // delete user by Id- 
-        @Override
-        public void deleteUserById(UUID id){
-            User user = userRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
-            userRepository.delete(user);
+        return ListResponseDTO.<UserDTO>builder()
+                .total(userRepository.count(spec))
+                .records(userDTOS)
+                .build();
+    }
+
+
+    @Override
+    public UserDTO updateUser(String userEmail, UserDTO userDTO, Long userId) {
+
+        log.info("updating user");
+
+        getUserByEmailInternal(userEmail);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, "User with provided ID not found"));
+
+        String email = StringUtils.trimToNull(userDTO.getEmail());
+
+        if (email != null && !email.equalsIgnoreCase(user.getEmail()) && userRepository.existsByEmail(email)) {
+            throw new BusinessException(ErrorCode.DUPLICATE_RESOURCE, "User already exists with this email");
         }
 
-        // activate user account -
-        @Override
-        public void activateUserAccount(UUID id) {
-            User user = userRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
-            if (user.isActive()) {
-                log.warn("User account is already active for user ID: {}", id);
-                throw new RuntimeException("User account is already active");
-            }
-            user.setActive(true);
-            userRepository.save(user);
-            log.info("User account activated successfully for user ID: {}", id);
+        if(userDTO.getEmail() != null){
+            userDTO.setEmail(email);
         }
 
-        // deactivate user account -
-        @Override
-        public void deactivateUserAccount(UUID id) {
-            User user = userRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
-            if (!user.isActive()) {
-                log.warn("User account is already inactive for user ID: {}", id);
-                throw new RuntimeException("User account is already inactive");
-            }
-            user.setActive(false);
-            userRepository.save(user);
-            log.info("User account deactivated successfully for user ID: {}", id);
+        UserMapper.updateEntity(userDTO, user);
+        User updatedUser = userRepository.save(user);
+
+        return UserMapper.toDto(updatedUser);
+    }
+
+
+
+    @Override
+    public UserDTO getUserByEmailInternal(String userEmail) {
+
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new BusinessException(ErrorCode.BAD_REQUEST, "User not found"));
+
+        return UserMapper.toDto(user);
+    }
+
+    @Override
+    public ListResponseDTO<UserDTO> deactivateUsersByUserIds(List<Long> userIds, String userEmail) {
+
+        log.info("Deactivating users with IDs: {}", userIds);
+        getUserByEmailInternal(userEmail);
+
+
+        if (ObjectUtils.isEmpty(userIds)) {
+            return ListResponseDTO.<UserDTO>builder()
+                    .total(0L)
+                    .records(List.of())
+                    .build();
         }
 
-        // fetch user by email-
-        @Override
-        public UserResponseDto fetchUserByEmail(String email) {
-            User user = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
-            return UserMapper.toUserResponseDto(user);
+        List<User> users = userRepository.findAllById(userIds);
+
+        if (users.size() != userIds.size()) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "One or more user IDs are invalid.");
         }
+
+        List<User> updatedUsers = userRepository.saveAll(users.stream().peek(user -> user.setActive(false)).toList());
+
+        return ListResponseDTO.<UserDTO>builder()
+                .total((long) updatedUsers.size())
+                .records(updatedUsers.stream().map(UserMapper::toDto).toList())
+                .build();
+    }
+
+    @Override
+    public ListResponseDTO<UserDTO> activateUsersByUserIds(List<Long> userIds, String userEmail) {
+
+        log.info("Activating users with IDs: {}", userIds);
+        getUserByEmailInternal(userEmail);
+
+
+        if (ObjectUtils.isEmpty(userIds)) {
+            return ListResponseDTO.<UserDTO>builder()
+                    .total(0L)
+                    .records(List.of())
+                    .build();
+        }
+
+        List<User> users = userRepository.findAllById(userIds);
+
+        if (users.size() != userIds.size()) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "One or more user IDs are invalid.");
+        }
+
+        List<User> updatedUsers = userRepository.saveAll(users.stream().peek(user -> user.setActive(true)).toList());
+
+        return ListResponseDTO.<UserDTO>builder()
+                .total((long) updatedUsers.size())
+                .records(updatedUsers.stream().map(UserMapper::toDto).toList())
+                .build();
+    }
+
+    @Override
+    public List<Long> getUserIdsByRoleId(Long roleId) {
+        log.info("Getting user IDs for role ID: {}", roleId);
+
+        if (roleId == null) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "Role ID is required");
+        }
+
+        return userRepository.findAllUserIdsByRoleId(roleId);
+    }
+
 }
