@@ -3,6 +3,7 @@ package com.taskflow.taskk.dto;
 import com.taskflow.taskk.entity.User;
 import com.taskflow.taskk.enums.TaskPriority;
 import com.taskflow.taskk.enums.TaskStatus;
+import com.taskflow.taskk.enums.TaskType;
 import lombok.Builder;
 import lombok.Data;
 
@@ -22,6 +23,8 @@ public class TaskDTO {
 
     private TaskPriority priority;
 
+    private TaskType taskType;
+
     private Long assignedTo;
 
     private LocalDateTime dueDate;
@@ -31,4 +34,6 @@ public class TaskDTO {
     private LocalDateTime updatedAt;
 
     private Long createdBy;
+
+    private Long updatedBy;
 }

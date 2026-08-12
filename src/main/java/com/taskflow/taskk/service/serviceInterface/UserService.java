@@ -17,6 +17,8 @@ public interface UserService {
 
     UserDTO getUserByEmailInternal(String userEmail);
 
+    UserDTO getUserByIdInternal(Long id);
+
     ListResponseDTO<UserDTO> deactivateUsersByUserIds(List<Long> userIds,String userEmail);
 
     ListResponseDTO<UserDTO> activateUsersByUserIds(List<Long> userIds, String userEmail);

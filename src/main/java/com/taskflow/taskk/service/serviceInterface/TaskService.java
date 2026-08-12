@@ -8,9 +8,7 @@ import com.taskflow.taskk.request.ParamRequest;
 
 public interface TaskService {
 
-    ListResponseDTO<TaskDTO> getAllTasks(String userEmail, ParamRequest request);
-
-    ListResponseDTO<TaskDTO> getAllTasks(ParamRequest request);
+    ListResponseDTO<TaskDTO> getAllTasks(ParamRequest request,String userEmail);
 
     TaskDTO createTask(TaskDTO taskDTO, String userEmail);
 
@@ -19,4 +17,6 @@ public interface TaskService {
     TaskDTO updateTask(String userEmail, TaskDTO taskDTO, Long taskId);
 
     void deleteTaskById(Long taskId, String userEmail);
+
+    void unassignTask(Long taskId, String userEmail);
 }

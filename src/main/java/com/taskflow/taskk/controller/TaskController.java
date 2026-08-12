@@ -22,21 +22,7 @@ public class TaskController {
     @GetMapping
     public ResponseEntity<BaseApiResponse<ListResponseDTO<TaskDTO>>> getTasks(@RequestHeader(HEADER_USERID) String userEmail, ParamRequest request) {
 
-        ListResponseDTO<TaskDTO> response = taskService.getAllTasks(userEmail, request);
-
-        return ResponseEntity.ok(
-                BaseApiResponse.<ListResponseDTO<TaskDTO>>builder()
-                        .status(HttpStatus.OK.value())
-                        .message("Tasks fetched successfully")
-                        .data(response)
-                        .build()
-        );
-    }
-
-    @GetMapping("/test")
-    public ResponseEntity<BaseApiResponse<ListResponseDTO<TaskDTO>>> getTasks(ParamRequest request) {
-
-        ListResponseDTO<TaskDTO> response = taskService.getAllTasks(request);
+        ListResponseDTO<TaskDTO> response = taskService.getAllTasks(request, userEmail);
 
         return ResponseEntity.ok(
                 BaseApiResponse.<ListResponseDTO<TaskDTO>>builder()
@@ -94,6 +80,20 @@ public class TaskController {
                 BaseApiResponse.<Void>builder()
                         .status(HttpStatus.OK.value())
                         .message("Task has been deleted successfully.")
+                        .data(null)
+                        .build()
+        );
+    }
+
+    @PatchMapping("/{id}/unassign")
+    public ResponseEntity<BaseApiResponse<Void>> unassignTask(@RequestHeader(HEADER_USERID) String userEmail, @PathVariable Long id) {
+
+        taskService.unassignTask(id, userEmail);
+
+        return ResponseEntity.ok(
+                BaseApiResponse.<Void>builder()
+                        .status(HttpStatus.OK.value())
+                        .message("Task unassigned successfully.")
                         .data(null)
                         .build()
         );
