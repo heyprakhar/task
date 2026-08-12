@@ -4,6 +4,7 @@ import com.taskflow.taskk.common.entity.BaseEntity;
 import com.taskflow.taskk.enums.TaskPriority;
 import com.taskflow.taskk.enums.TaskStatus;
 
+import com.taskflow.taskk.enums.TaskType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,7 +38,13 @@ public class Task extends BaseEntity {
     @Column(name = "assigned_to")
     private Long assignedTo;
 
+    private TaskType taskType;
+
     private Long createdBy;
+
+    private Long updatedBy;
+
+    private Long deletedBy;
 
     private LocalDateTime dueDate;
 }
