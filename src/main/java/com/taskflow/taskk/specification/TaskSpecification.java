@@ -21,4 +21,20 @@ public class TaskSpecification {
             return root.get("status").in(taskStatuses);
         };
     }
+
+    public static Specification<Task> search(String search) {
+        return (root, query, cb) -> {
+
+            if (search == null || search.trim().isEmpty()) {
+                return cb.conjunction();
+            }
+
+            String keyword = "%" + search.trim().toLowerCase() + "%";
+
+            return cb.or(
+                    cb.like(cb.lower(root.get("title")), keyword),
+                    cb.like(cb.lower(root.get("description")), keyword)
+            );
+        };
+    }
 }

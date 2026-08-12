@@ -1,6 +1,9 @@
 package com.taskflow.taskk.request;
 
 import com.taskflow.taskk.dto.requestDto.ListingRequestDto;
+import com.taskflow.taskk.enums.TaskActivityActorType;
+import com.taskflow.taskk.enums.TaskActivityType;
+import com.taskflow.taskk.enums.TaskLinkType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -23,6 +26,13 @@ public class ParamRequest extends ListingRequestDto{
     private Long userRoleId;
     private String search;
     private boolean activateUser;
+    private TaskLinkType taskLinkType;
+    private Long sourceTaskId;
+    private Long targetTaskId;
+    private Long taskId;
+    private TaskActivityType taskActivityType;
+    private Long taskActivityPerformedBy;
+    private TaskActivityActorType taskActivityActorType;
 
     public boolean isRecords() { return Boolean.TRUE.equals(records); }
 

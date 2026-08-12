@@ -20,10 +20,13 @@ public class TaskMapper {
                 .description(task.getDescription())
                 .status(task.getStatus())
                 .priority(task.getPriority())
-                .assignedTo(task.getAssignedTo() != null ? task.getAssignedTo() : null)
+                .taskType(task.getTaskType())
+                .assignedTo(task.getAssignedTo())
+                .dueDate(task.getDueDate())
                 .createdAt(task.getCreatedAt())
                 .updatedAt(task.getUpdatedAt())
                 .createdBy(task.getCreatedBy())
+                .updatedBy(task.getUpdatedBy())
                 .build();
     }
 
@@ -37,13 +40,10 @@ public class TaskMapper {
                 .description(taskDTO.getDescription())
                 .status(taskDTO.getStatus())
                 .priority(taskDTO.getPriority())
+                .taskType(taskDTO.getTaskType())
+                .assignedTo(taskDTO.getAssignedTo())
+                .dueDate(taskDTO.getDueDate())
                 .build();
-
-        if (taskDTO.getAssignedTo() != null) {
-            User user = new User();
-            user.setId(taskDTO.getAssignedTo());
-            task.setAssignedTo(user.getId());
-        }
 
         return task;
     }
@@ -66,9 +66,16 @@ public class TaskMapper {
             task.setPriority(taskDTO.getPriority());
         }
 
+        if (taskDTO.getTaskType() != null) {
+            task.setTaskType(taskDTO.getTaskType());
+        }
+
+        if (taskDTO.getAssignedTo() != null) {
+            task.setAssignedTo(taskDTO.getAssignedTo());
+        }
+
         if (taskDTO.getDueDate() != null) {
             task.setDueDate(taskDTO.getDueDate());
         }
-
     }
 }

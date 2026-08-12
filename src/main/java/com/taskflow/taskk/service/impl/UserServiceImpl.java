@@ -137,6 +137,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserDTO getUserByIdInternal(Long userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, "User not found"));
+
+        return UserMapper.toDto(user);
+    }
+
+    @Override
     public ListResponseDTO<UserDTO> deactivateUsersByUserIds(List<Long> userIds, String userEmail) {
 
         log.info("Deactivating users with IDs: {}", userIds);
