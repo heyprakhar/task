@@ -1,7 +1,8 @@
 package com.taskflow.taskk.config.security;
 
 import com.taskflow.taskk.config.security.service.JwtService;
-import com.taskflow.taskk.config.security.service.impl.TaskUserDetailsService;
+import com.taskflow.taskk.config.security.service.TaskUserDetailsService;
+import com.taskflow.taskk.config.security.service.impl.TaskUserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -48,7 +49,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             UserDetails userDetails = taskUserDetailsService.loadUserByUsername(username);
 
-            if (jwtService.isTokenValid(token, (CustomUserDetails) userDetails)) {
+            if (userDetails.isEnabled() && jwtService.isTokenValid(token, (CustomUserDetails) userDetails)) {
 
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(

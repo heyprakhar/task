@@ -17,6 +17,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,6 +30,7 @@ public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
     private final UserService userService;
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'BACKEND_DEVELOPER')")
     @Override
     public ListResponseDTO<TaskDTO> getAllTasks(ParamRequest request, String userEmail) {
 
