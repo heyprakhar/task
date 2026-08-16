@@ -63,6 +63,14 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    public RoleDTO getRoleByIdInternal(Long roleId){
+        Role role =  roleRepository.findById(roleId)
+                .orElseThrow(()-> new BusinessException(ErrorCode.BAD_REQUEST,"No role found with id:"+roleId));
+
+        return RoleMapper.toDto(role);
+    }
+
+    @Override
     public RoleDTO getRoleById(String userEmail, Long roleId) {
         log.info("Getting role by id: {}", roleId);
 

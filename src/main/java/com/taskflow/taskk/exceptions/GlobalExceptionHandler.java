@@ -22,6 +22,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import org.springframework.security.access.AccessDeniedException;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -161,6 +162,17 @@ public class GlobalExceptionHandler {
 
         return buildResponse(ErrorCode.RESOURCE_NOT_FOUND, "No resource found for " + ex.getResourcePath());
     }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public BaseApiResponse<Void> handleAccessDeniedException(
+            AccessDeniedException ex
+    ) {
+        return buildResponse(
+                ErrorCode.PERMISSION_DENIED,
+                ErrorCode.PERMISSION_DENIED.getDefaultMessage()
+        );
+    }
+
 
     @ExceptionHandler(Exception.class)
     public BaseApiResponse<Void> handleException(Exception ex, HttpServletRequest request) {
