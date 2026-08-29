@@ -1,5 +1,6 @@
 package com.taskflow.taskk.service.impl;
 
+import com.taskflow.taskk.annotation.HasAnyPermission;
 import com.taskflow.taskk.dto.TaskDTO;
 import com.taskflow.taskk.dto.UserDTO;
 import com.taskflow.taskk.dto.responseDto.ListResponseDTO;
@@ -9,6 +10,7 @@ import com.taskflow.taskk.exceptions.ErrorCode;
 import com.taskflow.taskk.mapper.TaskMapper;
 import com.taskflow.taskk.repository.TaskRepository;
 import com.taskflow.taskk.request.ParamRequest;
+import com.taskflow.taskk.service.serviceInterface.PermissionService;
 import com.taskflow.taskk.service.serviceInterface.TaskService;
 import com.taskflow.taskk.service.serviceInterface.UserService;
 import com.taskflow.taskk.specification.TaskSpecification;
@@ -17,10 +19,11 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static com.taskflow.taskk.utils.PermissionConstants.*;
 
 @Service
 @AllArgsConstructor
@@ -29,8 +32,9 @@ public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
     private final UserService userService;
+    private final PermissionService permissionService;
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'BACKEND_DEVELOPER')")
+    @HasAnyPermission({TASK_MANAGEMENT, TASK_VIEW})
     @Override
     public ListResponseDTO<TaskDTO> getAllTasks(ParamRequest request, String userEmail) {
 
@@ -60,18 +64,29 @@ public class TaskServiceImpl implements TaskService {
                 .build();
     }
 
-
+    @HasAnyPermission({TASK_MANAGEMENT, TASK_CREATE})
     @Override
     public TaskDTO createTask(TaskDTO taskDTO, String userEmail) {
+
         validateTask(taskDTO);
-        validateAssignee(taskDTO.getAssignedTo());
+
         UserDTO userDTO = userService.getUserByEmailInternal(userEmail);
+
         Task task = TaskMapper.toEntity(taskDTO);
         task.setCreatedBy(userDTO.getId());
+
+        if (permissionService.hasAnyPermission(TASK_ASSIGNMENT_MANAGEMENT)) {
+            validateAssignee(taskDTO.getAssignedTo());
+            task.setAssignedTo(taskDTO.getAssignedTo());
+        } else {
+            task.setAssignedTo(userDTO.getId());
+        }
+
         taskRepository.save(task);
         return TaskMapper.toDto(task);
     }
 
+    @HasAnyPermission({TASK_MANAGEMENT, TASK_VIEW})
     @Override
     public TaskDTO getTaskById(Long taskId, String userEmail) {
 
@@ -88,6 +103,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
 
+    @HasAnyPermission({TASK_MANAGEMENT, TASK_UPDATE})
     @Override
     public TaskDTO updateTask(String userEmail, TaskDTO taskDTO, Long taskId) {
 
@@ -96,12 +112,18 @@ public class TaskServiceImpl implements TaskService {
         }
 
         validateTaskUpdate(taskDTO);
-        validateAssignee(taskDTO.getAssignedTo());
 
         UserDTO userDTO = userService.getUserByEmailInternal(userEmail);
 
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND, "Task not found."));
+
+        if (taskDTO.getAssignedTo() != null) {
+            if (!permissionService.hasAnyPermission(TASK_ASSIGNMENT_MANAGEMENT)) {
+                throw new BusinessException(ErrorCode.PERMISSION_DENIED, "You do not have permission to change task assignment.");
+            }
+            validateAssignee(taskDTO.getAssignedTo());
+        }
 
         TaskMapper.updateEntity(task, taskDTO);
         task.setUpdatedBy(userDTO.getId());
@@ -110,6 +132,7 @@ public class TaskServiceImpl implements TaskService {
         return TaskMapper.toDto(task);
     }
 
+    @HasAnyPermission({TASK_MANAGEMENT, TASK_DELETE})
     @Override
     public void deleteTaskById(Long taskId, String userEmail) {
         UserDTO user = userService.getUserByEmailInternal(userEmail);
@@ -125,6 +148,7 @@ public class TaskServiceImpl implements TaskService {
         taskRepository.delete(task);
     }
 
+    @HasAnyPermission({TASK_MANAGEMENT, TASK_ASSIGNMENT_MANAGEMENT})
     @Override
     public void unassignTask(Long taskId, String userEmail) {
 
