@@ -1,11 +1,15 @@
 package com.taskflow.taskk.config.security;
 
+import com.taskflow.taskk.annotation.HasAnyPermission;
+import com.taskflow.taskk.config.security.authorization.HasAnyPermissionAuthorizationManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.aop.support.annotation.AnnotationMatchingPointcut;
+import org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -23,6 +27,7 @@ public class SecurityConfig {
     private final PasswordEncoder passwordEncoder;
     private final UserDetailsService userDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final HasAnyPermissionAuthorizationManager hasAnyPermissionAuthorizationManager;
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
@@ -34,6 +39,12 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
+    }
+
+    @Bean
+    public AuthorizationManagerBeforeMethodInterceptor hasAnyPermissionInterceptor() {
+        AnnotationMatchingPointcut pointcut = new AnnotationMatchingPointcut(null, HasAnyPermission.class);
+        return new AuthorizationManagerBeforeMethodInterceptor(pointcut, hasAnyPermissionAuthorizationManager);
     }
 
     @Bean
